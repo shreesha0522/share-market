@@ -1,0 +1,221 @@
+response_id,age_group,gender,education,occupation,monthly_income,years_investing,portfolio_size,trade_frequency,sectors_invested,info_source,lacks_knowledge,hard_to_access_info,volatility_difficulty,broker_platform_issues,regulatory_confusion,emotional_control,limited_capital,misled_by_rumors,ipo_process_confusing,lacks_mentorship,profitable_experience,confidence_change
+1,55+,Female,Bachelor's,Student,"Below 25,000",1-3 years,"Below 50,000",A few times a year,"Banking, Insurance, Hotels",Financial news,4,4,4,2,2,3,3,4,3,3,No,Higher
+2,25-34,Male,High school,Salaried employee,"Below 25,000",<1 year,"Below 50,000",Rarely,"Insurance, Hotels",Financial news,3,5,4,3,5,3,4,2,3,4,Not sure,Higher
+3,45-54,Male,Master's,Student,"Below 25,000",5+ years,"Below 50,000",Weekly,Insurance,Friends & family,1,3,2,2,3,3,1,2,4,3,Break-even,Much higher
+4,45-54,Female,Bachelor's,Student,"25,000-50,000",3-5 years,"200,000-500,000",A few times a year,"Hydropower, Hotels",ShareSansar/MeroLagani,3,3,2,2,3,2,3,3,5,2,Break-even,Lower
+5,25-34,Male,Master's,Salaried employee,"50,000-100,000",1-3 years,"500,000-1,000,000",Monthly,"Microfinance, Insurance",Social media,3,4,5,4,5,3,3,4,3,5,Break-even,Same
+6,18-24,Male,Bachelor's,Salaried employee,"Below 25,000",<1 year,"Below 50,000",Weekly,"Microfinance, Manufacturing, Hotels",TMS/broker app,4,4,5,3,4,5,5,2,3,4,No,Same
+7,25-34,Prefer not to say,Bachelor's,Business owner,"50,000-100,000",3-5 years,"Below 50,000",Monthly,Banking,Social media,4,3,2,3,3,3,4,3,4,4,Yes,Higher
+8,18-24,Male,Other,Salaried employee,"25,000-50,000",3-5 years,"Above 1,000,000",Rarely,Hydropower,Social media,4,3,3,4,4,4,3,3,3,1,No,Much higher
+9,18-24,Male,Bachelor's,Salaried employee,"50,000-100,000",<1 year,"200,000-500,000",Weekly,"Banking, Hotels, Hydropower",Social media,2,3,5,5,4,4,5,4,4,4,Yes,Much higher
+10,55+,Male,Bachelor's,Salaried employee,Prefer not to say,3-5 years,"Below 50,000",Weekly,"Manufacturing, Microfinance, Hydropower",Financial news,3,3,2,3,3,2,3,3,4,4,No,Same
+11,35-44,Female,Master's,Salaried employee,"50,000-100,000",3-5 years,"200,000-500,000",Monthly,"Hydropower, Banking",Friends & family,1,5,2,4,3,3,3,1,4,2,Yes,Much higher
+12,45-54,Male,Bachelor's,Salaried employee,"Below 25,000",1-3 years,"Below 50,000",Rarely,"Hydropower, Hotels",Friends & family,3,5,5,3,3,4,4,5,5,4,No,Higher
+13,25-34,Male,High school,Salaried employee,"Below 25,000",<1 year,"Below 50,000",Weekly,"Banking, Insurance",Financial advisor,3,4,2,3,5,5,4,4,4,5,Not sure,Higher
+14,18-24,Female,High school,Salaried employee,"Above 100,000",<1 year,"50,000-200,000",Monthly,Hydropower,Friends & family,4,4,4,4,5,4,3,4,5,5,Not sure,Higher
+15,18-24,Male,Master's,Business owner,Prefer not to say,3-5 years,"50,000-200,000",Monthly,"Hydropower, Insurance, Banking",Financial advisor,2,4,3,1,1,3,2,3,2,4,Not sure,Higher
+16,25-34,Male,High school,Salaried employee,"50,000-100,000",1-3 years,"Below 50,000",Rarely,Insurance,ShareSansar/MeroLagani,2,5,4,5,5,5,4,4,5,5,Yes,Lower
+17,25-34,Male,Master's,Self-employed,Prefer not to say,5+ years,"200,000-500,000",Monthly,"Microfinance, Banking, Hydropower",Social media,2,2,1,2,4,1,4,3,3,3,Break-even,Same
+18,25-34,Male,Bachelor's,Salaried employee,"Above 100,000",1-3 years,"Above 1,000,000",Monthly,"Hotels, Hydropower, Banking",Social media,4,4,4,3,3,5,4,4,3,4,No,Lower
+19,25-34,Male,Bachelor's,Salaried employee,"25,000-50,000",1-3 years,"50,000-200,000",Daily,Insurance,Financial advisor,4,5,5,4,3,4,5,4,4,4,No,Higher
+20,35-44,Male,High school,Student,"Below 25,000",1-3 years,"Below 50,000",Daily,Hotels,Financial advisor,5,5,3,3,3,3,3,3,4,4,Yes,Same
+21,25-34,Male,Master's,Salaried employee,"Above 100,000",<1 year,"Above 1,000,000",Daily,"Hydropower, Manufacturing, Insurance",Financial advisor,5,5,4,4,2,5,5,4,4,2,Break-even,Same
+22,45-54,Female,High school,Self-employed,"25,000-50,000",1-3 years,"Below 50,000",Monthly,"Insurance, Hotels",Social media,2,5,2,5,2,5,3,5,3,5,Not sure,Higher
+23,25-34,Male,Master's,Salaried employee,"25,000-50,000",5+ years,"Below 50,000",Monthly,Microfinance,TMS/broker app,5,3,2,3,3,3,3,3,2,2,No,Higher
+24,25-34,Male,Master's,Student,"25,000-50,000",1-3 years,"200,000-500,000",A few times a year,"Manufacturing, Microfinance",ShareSansar/MeroLagani,3,4,3,3,3,3,5,5,4,5,Yes,Higher
+25,35-44,Male,High school,Student,"25,000-50,000",1-3 years,"50,000-200,000",Monthly,"Hydropower, Insurance, Hotels",ShareSansar/MeroLagani,3,3,5,4,4,5,4,4,5,5,Break-even,Higher
+26,45-54,Male,PhD,Business owner,"Below 25,000",1-3 years,"200,000-500,000",Monthly,Hotels,Friends & family,5,2,3,2,5,5,5,3,5,3,Break-even,Lower
+27,35-44,Male,Master's,Other,"25,000-50,000",5+ years,"50,000-200,000",Rarely,"Hydropower, Banking",Financial advisor,2,2,3,2,3,5,4,3,4,2,No,Same
+28,18-24,Female,Bachelor's,Student,"Above 100,000",1-3 years,"50,000-200,000",Monthly,"Banking, Hydropower, Hotels",Financial news,4,4,5,5,4,4,4,3,5,3,Yes,Higher
+29,45-54,Male,Master's,Student,"Above 100,000",3-5 years,"Below 50,000",Monthly,Hotels,Social media,4,4,1,3,2,2,3,4,2,1,Not sure,Lower
+30,25-34,Male,High school,Self-employed,"Above 100,000",1-3 years,"50,000-200,000",A few times a year,Manufacturing,TMS/broker app,5,4,3,4,4,5,2,5,4,4,Break-even,Much lower
+31,25-34,Male,Master's,Salaried employee,"25,000-50,000",<1 year,"200,000-500,000",Monthly,"Banking, Hydropower, Manufacturing",TMS/broker app,2,4,4,5,5,5,4,3,5,4,Yes,Higher
+32,45-54,Male,Bachelor's,Student,"25,000-50,000",<1 year,"50,000-200,000",Daily,"Banking, Microfinance",TMS/broker app,5,2,4,4,3,3,3,5,5,5,Yes,Same
+33,35-44,Male,High school,Business owner,"Below 25,000",<1 year,"200,000-500,000",Weekly,"Manufacturing, Hydropower",Financial advisor,2,3,4,3,5,4,5,5,4,5,No,Much higher
+34,18-24,Female,Bachelor's,Business owner,"25,000-50,000",1-3 years,"500,000-1,000,000",Weekly,"Insurance, Hydropower",ShareSansar/MeroLagani,5,4,4,5,5,5,3,4,3,4,Yes,Much lower
+35,18-24,Male,Bachelor's,Salaried employee,"50,000-100,000",5+ years,"200,000-500,000",Weekly,"Hydropower, Hotels",ShareSansar/MeroLagani,2,4,3,5,4,3,4,2,1,2,Not sure,Lower
+36,35-44,Male,Master's,Salaried employee,"Above 100,000",<1 year,"200,000-500,000",Monthly,"Insurance, Microfinance",Friends & family,3,4,4,4,4,5,3,3,5,3,No,Higher
+37,18-24,Male,PhD,Student,"Below 25,000",<1 year,"50,000-200,000",A few times a year,Hotels,TMS/broker app,4,3,4,5,5,5,5,4,4,3,Yes,Much higher
+38,18-24,Female,Master's,Student,"50,000-100,000",5+ years,"500,000-1,000,000",Daily,Manufacturing,Financial advisor,4,3,2,4,2,3,2,4,3,3,No,Higher
+39,18-24,Female,Master's,Salaried employee,"25,000-50,000",3-5 years,"Below 50,000",A few times a year,"Hotels, Microfinance",Social media,3,2,1,3,2,3,3,1,1,3,Not sure,Higher
+40,18-24,Female,High school,Student,"25,000-50,000",1-3 years,"Below 50,000",Rarely,Hotels,ShareSansar/MeroLagani,5,4,4,3,4,5,4,4,4,4,Break-even,Same
+41,25-34,Male,Bachelor's,Salaried employee,"25,000-50,000",1-3 years,"Above 1,000,000",A few times a year,"Hydropower, Insurance, Banking",TMS/broker app,5,5,3,4,4,4,5,5,4,3,No,Same
+42,25-34,Male,Bachelor's,Salaried employee,"Below 25,000",3-5 years,"500,000-1,000,000",Monthly,"Banking, Hotels",Financial news,4,3,3,4,2,3,3,3,2,2,Not sure,Lower
+43,18-24,Female,PhD,Salaried employee,"Above 100,000",3-5 years,"Below 50,000",A few times a year,Banking,Financial advisor,3,3,4,1,3,3,3,2,4,3,Yes,Higher
+44,55+,Male,Bachelor's,Self-employed,"Below 25,000",1-3 years,"500,000-1,000,000",A few times a year,"Manufacturing, Hydropower",ShareSansar/MeroLagani,4,5,3,5,5,5,3,4,4,5,Break-even,Same
+45,18-24,Male,Master's,Student,"Above 100,000",<1 year,"50,000-200,000",A few times a year,"Banking, Microfinance, Manufacturing",ShareSansar/MeroLagani,4,4,4,5,3,3,5,5,4,4,Break-even,Higher
+46,25-34,Male,Bachelor's,Student,"Below 25,000",1-3 years,"50,000-200,000",Monthly,"Microfinance, Hydropower, Banking",Friends & family,5,5,4,3,3,4,3,5,3,5,Not sure,Lower
+47,35-44,Male,PhD,Business owner,"50,000-100,000",1-3 years,"200,000-500,000",Rarely,Hydropower,Friends & family,5,4,4,5,3,4,4,4,4,3,Yes,Higher
+48,35-44,Male,Bachelor's,Student,"50,000-100,000",3-5 years,"200,000-500,000",Daily,"Manufacturing, Insurance",ShareSansar/MeroLagani,3,4,5,3,5,4,3,4,4,2,No,Higher
+49,25-34,Male,Bachelor's,Business owner,"Above 100,000",1-3 years,"50,000-200,000",Daily,"Hotels, Banking",TMS/broker app,3,4,3,4,3,4,4,4,4,4,Break-even,Higher
+50,35-44,Male,Bachelor's,Salaried employee,"50,000-100,000",3-5 years,"Below 50,000",Monthly,"Banking, Manufacturing",Social media,4,3,3,2,4,3,3,2,3,3,No,Same
+51,25-34,Male,Bachelor's,Salaried employee,"Below 25,000",5+ years,"50,000-200,000",Rarely,"Hydropower, Hotels",Friends & family,1,3,1,3,3,4,3,2,2,3,Yes,Much lower
+52,35-44,Male,Master's,Business owner,"50,000-100,000",3-5 years,"500,000-1,000,000",Weekly,Insurance,Financial advisor,3,2,3,3,2,3,3,3,3,4,No,Higher
+53,18-24,Male,Bachelor's,Business owner,"25,000-50,000",3-5 years,"200,000-500,000",Rarely,Hotels,Financial news,3,3,3,2,3,3,3,3,3,3,Not sure,Much higher
+54,25-34,Male,Bachelor's,Salaried employee,"25,000-50,000",3-5 years,"500,000-1,000,000",Rarely,Hydropower,Social media,3,4,4,2,3,3,3,4,3,3,No,Much lower
+55,25-34,Male,Bachelor's,Salaried employee,"25,000-50,000",<1 year,"Below 50,000",Monthly,"Banking, Hotels",Financial news,4,5,5,4,4,3,4,3,5,2,Break-even,Higher
+56,35-44,Male,Master's,Student,Prefer not to say,1-3 years,"200,000-500,000",Monthly,Microfinance,Friends & family,3,3,5,3,2,4,5,5,3,3,Yes,Lower
+57,18-24,Male,Master's,Student,"50,000-100,000",3-5 years,"Below 50,000",Rarely,"Insurance, Hydropower",Social media,5,3,3,4,2,2,3,3,1,3,No,Higher
+58,35-44,Female,Master's,Student,"25,000-50,000",5+ years,"Below 50,000",Weekly,"Hotels, Insurance",Financial advisor,4,4,1,3,4,1,3,3,3,2,No,Same
+59,35-44,Other,High school,Student,"50,000-100,000",3-5 years,"50,000-200,000",Weekly,"Hydropower, Microfinance",TMS/broker app,2,2,3,2,3,1,3,4,1,3,No,Higher
+60,35-44,Male,Master's,Salaried employee,"Below 25,000",5+ years,"50,000-200,000",Rarely,Microfinance,ShareSansar/MeroLagani,4,3,4,2,2,2,3,4,3,4,Break-even,Lower
+61,18-24,Female,Master's,Business owner,"Below 25,000",3-5 years,"50,000-200,000",Weekly,"Hotels, Microfinance",TMS/broker app,4,3,3,3,3,4,1,4,1,3,No,Higher
+62,25-34,Female,High school,Student,"Above 100,000",3-5 years,"50,000-200,000",Daily,"Banking, Manufacturing, Hotels",Financial news,4,3,3,4,4,3,3,2,2,3,No,Lower
+63,18-24,Prefer not to say,Bachelor's,Unemployed,"25,000-50,000",<1 year,"50,000-200,000",Monthly,"Banking, Microfinance",Financial advisor,4,4,3,3,3,4,4,3,5,5,Yes,Same
+64,18-24,Female,Bachelor's,Student,"50,000-100,000",<1 year,"50,000-200,000",Monthly,Insurance,Friends & family,2,5,3,4,3,2,4,5,3,2,Yes,Same
+65,18-24,Male,Bachelor's,Student,"25,000-50,000",3-5 years,"Above 1,000,000",A few times a year,Microfinance,Social media,4,3,3,2,2,2,3,4,2,1,No,Higher
+66,55+,Female,Bachelor's,Salaried employee,"25,000-50,000",5+ years,"Below 50,000",A few times a year,"Hydropower, Banking",Financial news,2,1,3,3,4,3,2,3,4,3,Yes,Much lower
+67,25-34,Male,Other,Unemployed,"Above 100,000",1-3 years,"200,000-500,000",Monthly,"Banking, Insurance",Financial news,5,5,3,4,4,3,5,5,3,4,Not sure,Higher
+68,55+,Male,Bachelor's,Business owner,"Above 100,000",<1 year,"200,000-500,000",Weekly,"Manufacturing, Hotels, Microfinance",Social media,2,5,4,3,4,4,4,4,5,4,Yes,Higher
+69,18-24,Prefer not to say,Master's,Salaried employee,"Below 25,000",1-3 years,"Below 50,000",Weekly,"Hotels, Microfinance",Financial news,4,3,3,4,3,2,5,5,3,4,Yes,Lower
+70,45-54,Male,Bachelor's,Salaried employee,"Above 100,000",1-3 years,"200,000-500,000",A few times a year,"Hotels, Manufacturing, Banking",Financial advisor,5,5,4,3,4,5,3,3,4,3,Not sure,Much higher
+71,25-34,Female,Master's,Salaried employee,"25,000-50,000",1-3 years,"50,000-200,000",A few times a year,Microfinance,Friends & family,5,4,5,4,4,4,4,4,5,4,Break-even,Much lower
+72,25-34,Male,Bachelor's,Business owner,Prefer not to say,<1 year,"Below 50,000",A few times a year,"Microfinance, Banking, Insurance",TMS/broker app,4,4,5,5,3,5,5,5,4,3,Break-even,Same
+73,25-34,Male,Bachelor's,Salaried employee,"Below 25,000",1-3 years,"Below 50,000",A few times a year,Hydropower,Financial advisor,3,3,3,1,5,4,5,5,4,4,Yes,Lower
+74,18-24,Male,Master's,Salaried employee,"Below 25,000",<1 year,"Below 50,000",Daily,"Banking, Microfinance",Financial news,5,3,5,4,4,3,2,5,5,4,Yes,Higher
+75,25-34,Female,High school,Salaried employee,"25,000-50,000",5+ years,"200,000-500,000",Rarely,"Hotels, Banking",TMS/broker app,3,3,1,4,2,2,3,4,2,3,Not sure,Higher
+76,35-44,Male,High school,Salaried employee,"25,000-50,000",<1 year,"Below 50,000",Rarely,Hotels,ShareSansar/MeroLagani,5,3,4,3,2,4,4,5,5,5,Yes,Lower
+77,18-24,Male,Master's,Salaried employee,"50,000-100,000",3-5 years,"50,000-200,000",Monthly,"Manufacturing, Microfinance",Social media,3,2,2,4,3,2,4,2,4,4,Break-even,Same
+78,25-34,Male,Bachelor's,Business owner,"25,000-50,000",5+ years,"500,000-1,000,000",Rarely,"Hydropower, Microfinance",Financial advisor,4,3,4,2,3,2,2,3,2,4,Not sure,Much higher
+79,18-24,Female,High school,Student,"Above 100,000",3-5 years,"Below 50,000",Monthly,"Insurance, Hydropower, Microfinance",ShareSansar/MeroLagani,4,3,3,1,3,4,3,1,2,4,Yes,Higher
+80,18-24,Male,High school,Salaried employee,"25,000-50,000",3-5 years,"200,000-500,000",A few times a year,"Microfinance, Hydropower",Social media,2,3,2,4,2,3,3,3,3,2,Yes,Higher
+81,25-34,Male,Bachelor's,Student,"25,000-50,000",3-5 years,"200,000-500,000",Rarely,Hydropower,Financial news,4,3,1,2,2,2,3,2,3,4,Yes,Same
+82,55+,Male,Master's,Unemployed,"Above 100,000",<1 year,"200,000-500,000",A few times a year,Hydropower,Friends & family,3,5,4,4,4,4,4,3,5,4,Yes,Same
+83,25-34,Male,Master's,Self-employed,"25,000-50,000",3-5 years,"50,000-200,000",Rarely,"Microfinance, Insurance, Hydropower",Social media,4,2,4,4,2,2,4,3,2,3,Not sure,Lower
+84,18-24,Female,High school,Self-employed,"25,000-50,000",5+ years,"Below 50,000",Weekly,Banking,TMS/broker app,2,4,2,3,3,1,3,3,4,3,No,Higher
+85,18-24,Male,Bachelor's,Student,"Below 25,000",<1 year,"Below 50,000",Rarely,Hotels,Financial advisor,5,3,5,4,4,5,2,3,4,3,Yes,Same
+86,18-24,Female,Bachelor's,Self-employed,"50,000-100,000",3-5 years,"Below 50,000",A few times a year,"Hotels, Hydropower",Financial advisor,2,1,4,3,3,4,4,2,3,2,Break-even,Lower
+87,25-34,Male,High school,Salaried employee,"50,000-100,000",1-3 years,"Below 50,000",Daily,"Manufacturing, Hotels, Microfinance",Financial news,5,2,4,5,4,5,4,3,2,3,No,Higher
+88,18-24,Male,Bachelor's,Business owner,"50,000-100,000",<1 year,"200,000-500,000",A few times a year,"Hydropower, Microfinance",Financial advisor,4,5,3,3,5,3,4,4,4,4,No,Higher
+89,18-24,Female,High school,Business owner,"Above 100,000",1-3 years,"50,000-200,000",Monthly,"Hydropower, Banking",Social media,2,3,5,5,3,3,4,4,3,4,No,Much lower
+90,55+,Male,High school,Student,"25,000-50,000",1-3 years,"Below 50,000",Daily,"Insurance, Banking, Hotels",Financial news,5,4,5,4,4,4,3,3,3,4,No,Higher
+91,45-54,Male,Bachelor's,Student,"Below 25,000",3-5 years,"Below 50,000",Weekly,Hydropower,Friends & family,3,2,3,2,2,4,4,2,4,3,Yes,Much higher
+92,45-54,Male,Bachelor's,Salaried employee,"25,000-50,000",3-5 years,"50,000-200,000",Daily,"Microfinance, Hydropower",Friends & family,2,3,2,3,3,4,3,1,5,4,No,Higher
+93,25-34,Female,Master's,Salaried employee,"25,000-50,000",5+ years,"50,000-200,000",Monthly,"Hydropower, Banking, Microfinance",Friends & family,2,2,2,2,3,2,5,3,4,3,No,Higher
+94,35-44,Other,Bachelor's,Other,"Below 25,000",1-3 years,"Below 50,000",Daily,Hydropower,Financial advisor,4,4,4,5,4,3,3,5,4,2,Break-even,Higher
+95,18-24,Male,Master's,Salaried employee,"Below 25,000",3-5 years,"200,000-500,000",Weekly,"Insurance, Banking",Friends & family,3,4,2,2,4,3,1,3,4,2,Yes,Higher
+96,25-34,Female,Bachelor's,Salaried employee,"50,000-100,000",5+ years,"50,000-200,000",Weekly,Hydropower,Financial news,2,3,2,4,2,3,3,2,3,4,Not sure,Higher
+97,18-24,Female,High school,Self-employed,"Above 100,000",1-3 years,"Below 50,000",Monthly,"Insurance, Banking",Social media,5,4,4,4,4,3,2,4,5,5,Yes,Lower
+98,35-44,Prefer not to say,Master's,Unemployed,"50,000-100,000",3-5 years,"Below 50,000",Weekly,"Microfinance, Manufacturing, Hydropower",Financial advisor,1,3,3,4,3,2,3,3,1,4,Break-even,Same
+99,35-44,Female,Master's,Business owner,"Below 25,000",5+ years,"50,000-200,000",Rarely,"Microfinance, Manufacturing",ShareSansar/MeroLagani,3,3,2,2,1,3,1,2,3,1,No,Higher
+100,18-24,Male,PhD,Salaried employee,"50,000-100,000",1-3 years,"50,000-200,000",A few times a year,"Microfinance, Manufacturing, Insurance",Financial advisor,4,3,3,4,2,3,5,3,5,3,No,Higher
+101,25-34,Female,Bachelor's,Salaried employee,"Above 100,000",3-5 years,"50,000-200,000",Weekly,Hydropower,TMS/broker app,3,3,2,3,4,4,5,3,4,5,Break-even,Same
+102,25-34,Female,Master's,Salaried employee,"25,000-50,000",3-5 years,"Above 1,000,000",Monthly,"Hydropower, Microfinance, Banking",Friends & family,4,2,2,3,4,4,3,3,1,2,Break-even,Same
+103,55+,Female,Master's,Business owner,"50,000-100,000",5+ years,"Below 50,000",Monthly,"Hydropower, Insurance, Banking",Friends & family,3,3,3,3,2,1,2,3,3,3,Yes,Higher
+104,55+,Prefer not to say,Bachelor's,Unemployed,"50,000-100,000",5+ years,"Below 50,000",Monthly,"Hydropower, Manufacturing, Hotels",Social media,3,4,3,3,4,1,2,3,4,3,Yes,Same
+105,45-54,Male,Master's,Student,Prefer not to say,1-3 years,"Above 1,000,000",Monthly,Hotels,Social media,4,3,5,3,2,5,3,5,3,5,No,Higher
+106,25-34,Male,Master's,Student,"25,000-50,000",1-3 years,"500,000-1,000,000",A few times a year,Banking,Financial news,4,3,4,3,4,4,4,5,5,4,Break-even,Same
+107,35-44,Female,Bachelor's,Self-employed,"50,000-100,000",3-5 years,"Below 50,000",Monthly,Hotels,Financial advisor,3,1,2,2,2,2,4,4,3,4,No,Same
+108,35-44,Male,Bachelor's,Self-employed,"Above 100,000",3-5 years,"Above 1,000,000",A few times a year,Insurance,Social media,4,2,1,3,3,5,3,3,2,3,No,Higher
+109,18-24,Prefer not to say,Bachelor's,Student,"Below 25,000",3-5 years,"Below 50,000",A few times a year,"Hotels, Insurance, Banking",Financial news,2,3,2,2,4,4,3,3,1,3,Yes,Higher
+110,25-34,Male,Master's,Student,"50,000-100,000",3-5 years,"Above 1,000,000",Monthly,"Hotels, Microfinance, Banking",TMS/broker app,1,4,3,1,3,3,3,4,1,4,Break-even,Higher
+111,18-24,Female,Master's,Other,"50,000-100,000",<1 year,"Below 50,000",Weekly,Manufacturing,Financial advisor,5,3,5,3,3,4,3,5,5,3,No,Lower
+112,55+,Female,Bachelor's,Salaried employee,"Below 25,000",1-3 years,"50,000-200,000",A few times a year,Insurance,Financial news,4,4,4,3,4,4,4,3,4,3,Yes,Higher
+113,35-44,Female,Bachelor's,Salaried employee,"Below 25,000",1-3 years,"50,000-200,000",Weekly,"Manufacturing, Hydropower, Banking",Friends & family,5,5,3,5,5,3,5,5,3,3,No,Much higher
+114,18-24,Male,Master's,Business owner,"Above 100,000",5+ years,"Below 50,000",Monthly,"Hydropower, Insurance",Financial advisor,1,3,3,3,4,2,3,2,3,3,Yes,Higher
+115,25-34,Male,Bachelor's,Business owner,"Below 25,000",5+ years,"50,000-200,000",Monthly,Insurance,TMS/broker app,2,1,3,2,1,4,3,3,3,1,Yes,Higher
+116,25-34,Male,Other,Student,"50,000-100,000",1-3 years,"50,000-200,000",Weekly,"Insurance, Hydropower, Manufacturing",Financial advisor,5,5,5,3,5,3,3,2,4,4,Yes,Much higher
+117,25-34,Male,Bachelor's,Salaried employee,"Below 25,000",<1 year,"50,000-200,000",Rarely,"Microfinance, Manufacturing, Hotels",TMS/broker app,3,4,4,3,4,4,3,4,3,3,Yes,Higher
+118,25-34,Male,Master's,Business owner,"25,000-50,000",1-3 years,"500,000-1,000,000",Rarely,"Insurance, Manufacturing",TMS/broker app,5,4,4,2,4,4,4,2,4,4,Yes,Higher
+119,35-44,Male,Bachelor's,Salaried employee,"50,000-100,000",1-3 years,"500,000-1,000,000",Monthly,"Insurance, Hotels",Social media,5,4,4,3,3,4,3,3,4,3,Yes,Same
+120,25-34,Prefer not to say,Bachelor's,Business owner,"Above 100,000",3-5 years,"200,000-500,000",Monthly,"Insurance, Microfinance",Financial advisor,3,4,2,3,2,3,2,2,2,3,No,Much higher
+121,25-34,Male,High school,Business owner,"Below 25,000",<1 year,"50,000-200,000",Monthly,Microfinance,Friends & family,5,5,5,4,4,4,4,2,5,4,No,Higher
+122,25-34,Female,High school,Student,"25,000-50,000",<1 year,"Below 50,000",Monthly,"Hydropower, Manufacturing, Microfinance",Financial advisor,5,1,3,4,5,5,3,5,4,4,No,Much higher
+123,45-54,Female,Bachelor's,Salaried employee,"Below 25,000",1-3 years,"Below 50,000",Daily,Insurance,Financial news,5,3,5,3,3,3,4,3,3,5,Break-even,Much higher
+124,35-44,Male,Bachelor's,Business owner,"25,000-50,000",1-3 years,"50,000-200,000",Weekly,Banking,Financial news,3,4,4,4,5,4,5,5,5,3,Yes,Much higher
+125,18-24,Male,Bachelor's,Salaried employee,"25,000-50,000",1-3 years,"50,000-200,000",Weekly,"Hydropower, Banking, Insurance",ShareSansar/MeroLagani,5,5,3,4,4,3,3,3,5,4,Break-even,Same
+126,25-34,Female,Bachelor's,Salaried employee,"Below 25,000",<1 year,"200,000-500,000",A few times a year,Hydropower,Social media,4,4,4,4,5,3,2,5,3,5,Yes,Higher
+127,35-44,Male,Master's,Salaried employee,"50,000-100,000",1-3 years,"50,000-200,000",A few times a year,"Hydropower, Microfinance",Social media,5,4,3,4,5,4,4,5,3,4,Not sure,Much higher
+128,35-44,Female,Bachelor's,Student,"25,000-50,000",1-3 years,"200,000-500,000",A few times a year,"Hydropower, Microfinance",TMS/broker app,4,4,4,3,5,5,3,4,4,4,No,Much higher
+129,35-44,Male,Bachelor's,Salaried employee,"25,000-50,000",<1 year,"200,000-500,000",Rarely,"Insurance, Hotels",TMS/broker app,4,4,5,5,4,4,4,4,4,3,Not sure,Much higher
+130,18-24,Female,Master's,Student,"50,000-100,000",3-5 years,"Below 50,000",A few times a year,"Microfinance, Manufacturing, Hydropower",TMS/broker app,4,3,3,2,3,3,2,3,2,2,No,Same
+131,18-24,Male,PhD,Business owner,Prefer not to say,<1 year,"50,000-200,000",Weekly,"Insurance, Banking, Hotels",Friends & family,5,3,4,4,5,4,2,4,5,4,Yes,Higher
+132,18-24,Female,Bachelor's,Salaried employee,"Below 25,000",1-3 years,"50,000-200,000",Weekly,Insurance,ShareSansar/MeroLagani,4,5,5,5,4,5,5,4,3,4,No,Higher
+133,25-34,Female,Bachelor's,Self-employed,"25,000-50,000",1-3 years,"50,000-200,000",Monthly,Hydropower,Financial advisor,5,4,5,4,4,4,4,4,3,4,Not sure,Lower
+134,25-34,Male,Master's,Salaried employee,"50,000-100,000",5+ years,"50,000-200,000",Monthly,"Banking, Hotels",Social media,4,2,1,4,3,1,5,3,3,4,Break-even,Lower
+135,18-24,Male,Bachelor's,Student,"25,000-50,000",1-3 years,"Below 50,000",Rarely,"Hotels, Banking, Manufacturing",Financial advisor,2,2,3,4,2,4,4,5,4,4,Yes,Same
+136,25-34,Male,Master's,Salaried employee,"50,000-100,000",<1 year,"Below 50,000",Daily,Insurance,TMS/broker app,5,5,3,3,5,4,4,4,3,4,Yes,Higher
+137,18-24,Male,Master's,Business owner,"Above 100,000",3-5 years,"50,000-200,000",Weekly,Hydropower,Social media,2,2,4,4,2,3,4,1,3,5,No,Much higher
+138,25-34,Female,Bachelor's,Salaried employee,"25,000-50,000",<1 year,"200,000-500,000",Weekly,"Manufacturing, Microfinance",TMS/broker app,5,4,4,3,4,1,4,3,5,5,Break-even,Higher
+139,35-44,Female,High school,Student,"25,000-50,000",5+ years,"200,000-500,000",Monthly,"Banking, Microfinance",TMS/broker app,4,2,3,3,3,3,3,2,3,2,Not sure,Lower
+140,25-34,Male,Bachelor's,Salaried employee,"Below 25,000",3-5 years,"Below 50,000",Daily,"Banking, Microfinance, Insurance",Social media,4,1,4,2,2,3,2,3,3,3,Break-even,Higher
+141,18-24,Female,Master's,Business owner,"50,000-100,000",5+ years,"Below 50,000",Monthly,"Hotels, Manufacturing",Friends & family,3,2,2,3,3,3,3,3,3,3,Yes,Lower
+142,18-24,Female,Bachelor's,Self-employed,"50,000-100,000",1-3 years,"Below 50,000",Weekly,"Hydropower, Hotels, Banking",Financial advisor,4,4,5,3,4,4,5,3,3,5,Not sure,Much higher
+143,18-24,Male,Master's,Student,"50,000-100,000",<1 year,"50,000-200,000",Weekly,"Microfinance, Insurance, Banking",TMS/broker app,5,4,5,5,3,3,4,2,4,4,No,Higher
+144,18-24,Prefer not to say,Bachelor's,Salaried employee,"Above 100,000",<1 year,"Below 50,000",Monthly,"Hotels, Microfinance, Insurance",Financial news,4,4,4,5,5,4,4,4,1,4,Yes,Higher
+145,45-54,Male,Master's,Salaried employee,"Above 100,000",<1 year,"200,000-500,000",A few times a year,"Hydropower, Microfinance, Insurance",ShareSansar/MeroLagani,4,5,4,3,3,5,4,3,2,3,Yes,Lower
+146,25-34,Male,Master's,Business owner,"Below 25,000",5+ years,"50,000-200,000",Monthly,"Hotels, Insurance",ShareSansar/MeroLagani,4,4,2,2,3,2,3,3,1,4,Yes,Higher
+147,35-44,Male,High school,Salaried employee,"25,000-50,000",<1 year,"Above 1,000,000",Monthly,"Banking, Hydropower, Hotels",ShareSansar/MeroLagani,3,4,3,3,4,4,4,4,3,3,No,Higher
+148,35-44,Female,Bachelor's,Salaried employee,"50,000-100,000",5+ years,"Below 50,000",Weekly,Microfinance,Friends & family,2,3,3,2,1,4,2,3,2,2,Yes,Lower
+149,45-54,Female,High school,Salaried employee,"Below 25,000",1-3 years,"Below 50,000",A few times a year,"Insurance, Microfinance, Banking",Financial news,4,4,3,4,4,3,4,5,4,5,No,Higher
+150,25-34,Female,High school,Salaried employee,"25,000-50,000",3-5 years,"Below 50,000",Daily,"Manufacturing, Banking, Insurance",TMS/broker app,2,3,4,3,3,4,2,3,2,3,Not sure,Lower
+151,45-54,Female,Master's,Student,"Below 25,000",<1 year,"50,000-200,000",Weekly,Manufacturing,TMS/broker app,3,5,3,5,4,3,4,3,3,4,Yes,Higher
+152,45-54,Male,Master's,Salaried employee,"50,000-100,000",3-5 years,"50,000-200,000",Monthly,Hotels,Financial advisor,4,5,2,3,3,2,3,3,2,3,Break-even,Same
+153,35-44,Female,Master's,Salaried employee,"50,000-100,000",1-3 years,"500,000-1,000,000",Weekly,Manufacturing,Social media,4,4,3,5,5,5,3,4,4,5,Yes,Same
+154,35-44,Male,High school,Business owner,"25,000-50,000",3-5 years,"Below 50,000",Daily,"Hydropower, Banking, Microfinance",TMS/broker app,4,3,4,2,2,1,2,3,1,2,No,Same
+155,45-54,Male,Bachelor's,Salaried employee,"50,000-100,000",1-3 years,"200,000-500,000",Weekly,Manufacturing,Social media,5,5,4,2,5,4,4,4,5,3,No,Lower
+156,18-24,Male,Bachelor's,Student,"50,000-100,000",<1 year,"200,000-500,000",Daily,"Microfinance, Manufacturing, Banking",Friends & family,5,5,5,3,3,4,4,5,5,4,Yes,Same
+157,35-44,Female,Bachelor's,Salaried employee,"25,000-50,000",<1 year,"200,000-500,000",Monthly,"Hydropower, Microfinance, Manufacturing",Financial news,4,4,3,4,4,2,4,3,3,2,Yes,Much higher
+158,25-34,Female,Bachelor's,Salaried employee,"Below 25,000",1-3 years,"200,000-500,000",Rarely,"Insurance, Manufacturing",Financial news,4,2,3,4,4,4,5,5,3,4,Yes,Same
+159,25-34,Female,Bachelor's,Student,"Below 25,000",<1 year,"500,000-1,000,000",Monthly,"Hydropower, Microfinance, Manufacturing",ShareSansar/MeroLagani,4,5,5,4,4,5,4,4,4,2,No,Much higher
+160,25-34,Female,PhD,Student,Prefer not to say,3-5 years,"Below 50,000",A few times a year,Banking,Financial advisor,3,2,3,3,2,3,2,3,3,1,Yes,Same
+161,25-34,Male,High school,Student,"Above 100,000",5+ years,"Below 50,000",Monthly,"Insurance, Hotels, Manufacturing",Financial advisor,4,3,1,3,2,3,2,3,2,2,No,Lower
+162,25-34,Male,Bachelor's,Business owner,"Below 25,000",1-3 years,"50,000-200,000",Daily,Microfinance,ShareSansar/MeroLagani,4,3,4,4,4,4,4,4,4,3,Yes,Same
+163,35-44,Female,High school,Salaried employee,"50,000-100,000",5+ years,"Below 50,000",Daily,Banking,TMS/broker app,2,3,2,2,4,3,2,1,3,3,Yes,Higher
+164,25-34,Male,Master's,Student,"25,000-50,000",3-5 years,"50,000-200,000",A few times a year,"Banking, Insurance, Hotels",Financial advisor,2,2,3,3,3,2,4,2,4,1,Break-even,Much higher
+165,18-24,Female,High school,Salaried employee,"50,000-100,000",5+ years,"50,000-200,000",Monthly,"Banking, Hydropower",Financial advisor,2,2,3,5,1,2,4,4,3,2,No,Higher
+166,35-44,Male,Bachelor's,Business owner,"50,000-100,000",<1 year,"Below 50,000",A few times a year,Hotels,TMS/broker app,4,3,5,3,2,4,4,4,5,3,Yes,Higher
+167,18-24,Male,High school,Salaried employee,"50,000-100,000",5+ years,"50,000-200,000",Monthly,"Hydropower, Insurance",Friends & family,3,2,4,1,3,4,2,2,2,2,Yes,Higher
+168,25-34,Male,Bachelor's,Student,"Above 100,000",1-3 years,"Below 50,000",A few times a year,"Manufacturing, Insurance",Friends & family,5,3,5,4,3,3,3,3,5,4,Break-even,Much higher
+169,35-44,Male,Master's,Student,"Below 25,000",5+ years,"50,000-200,000",Weekly,Hydropower,Financial advisor,1,2,5,3,3,3,1,2,2,2,Yes,Lower
+170,25-34,Female,Master's,Salaried employee,"Below 25,000",5+ years,"Below 50,000",Weekly,Banking,ShareSansar/MeroLagani,3,3,4,2,1,2,3,2,3,2,No,Much higher
+171,18-24,Female,Master's,Business owner,"Below 25,000",5+ years,"200,000-500,000",Rarely,Hotels,Social media,2,3,4,2,3,3,4,3,4,2,Yes,Higher
+172,35-44,Male,Master's,Student,"Below 25,000",3-5 years,"200,000-500,000",Monthly,"Manufacturing, Hydropower",Financial advisor,2,4,1,3,4,3,3,3,4,3,Not sure,Lower
+173,18-24,Male,Bachelor's,Salaried employee,"Below 25,000",<1 year,"50,000-200,000",A few times a year,"Hotels, Microfinance, Hydropower",Financial advisor,4,4,3,3,4,2,5,4,5,5,Yes,Much higher
+174,18-24,Female,Bachelor's,Salaried employee,"25,000-50,000",<1 year,"200,000-500,000",Weekly,"Hotels, Microfinance",Financial news,5,5,5,4,5,2,5,4,4,3,No,Same
+175,35-44,Female,Master's,Business owner,"25,000-50,000",3-5 years,"200,000-500,000",Weekly,Banking,TMS/broker app,2,3,4,2,2,1,3,5,3,3,No,Much higher
+176,18-24,Male,Other,Self-employed,"Below 25,000",3-5 years,"200,000-500,000",Weekly,"Banking, Manufacturing, Microfinance",Friends & family,2,2,3,2,2,1,4,3,3,4,No,Lower
+177,18-24,Male,Bachelor's,Salaried employee,"Below 25,000",5+ years,"200,000-500,000",Weekly,"Microfinance, Manufacturing, Hydropower",Financial news,3,2,2,3,3,3,4,3,2,2,Yes,Same
+178,25-34,Male,Bachelor's,Student,"25,000-50,000",1-3 years,"50,000-200,000",A few times a year,Microfinance,Financial news,4,3,4,4,4,4,5,4,4,4,Yes,Much higher
+179,35-44,Male,Bachelor's,Student,"Below 25,000",1-3 years,"500,000-1,000,000",Rarely,"Manufacturing, Banking, Hotels",TMS/broker app,5,5,4,5,4,5,3,4,4,4,Break-even,Higher
+180,25-34,Male,Master's,Business owner,"Below 25,000",5+ years,"50,000-200,000",Monthly,"Manufacturing, Microfinance, Banking",TMS/broker app,2,4,3,2,2,2,2,3,2,3,No,Much higher
+181,55+,Male,Master's,Salaried employee,"Above 100,000",<1 year,"50,000-200,000",Monthly,"Insurance, Microfinance",TMS/broker app,5,3,4,4,5,5,4,2,5,3,Not sure,Same
+182,55+,Male,Bachelor's,Salaried employee,"Above 100,000",<1 year,"50,000-200,000",A few times a year,Hotels,Social media,3,5,3,4,4,5,5,2,5,3,No,Higher
+183,18-24,Male,Bachelor's,Student,"25,000-50,000",<1 year,"Below 50,000",Monthly,"Microfinance, Banking",Friends & family,4,4,5,5,4,5,3,4,4,4,No,Same
+184,35-44,Female,Master's,Salaried employee,"50,000-100,000",<1 year,"500,000-1,000,000",Monthly,"Manufacturing, Insurance, Microfinance",Financial advisor,5,4,3,5,5,4,5,4,4,4,Break-even,Lower
+185,18-24,Female,Bachelor's,Salaried employee,"Below 25,000",1-3 years,"Below 50,000",Daily,Microfinance,Financial advisor,5,4,4,4,2,4,4,3,5,5,Break-even,Lower
+186,25-34,Prefer not to say,Master's,Self-employed,"50,000-100,000",1-3 years,"50,000-200,000",Weekly,"Hotels, Hydropower, Manufacturing",Financial news,4,2,4,4,5,3,2,4,2,5,Not sure,Much higher
+187,18-24,Female,High school,Salaried employee,"25,000-50,000",1-3 years,"500,000-1,000,000",Daily,Banking,Financial advisor,5,4,4,3,3,4,3,3,5,4,Yes,Higher
+188,18-24,Male,Master's,Student,"Below 25,000",<1 year,"50,000-200,000",A few times a year,"Hotels, Microfinance",Financial news,5,3,5,3,4,4,4,5,2,4,No,Much higher
+189,18-24,Male,Bachelor's,Student,"Below 25,000",3-5 years,"50,000-200,000",Weekly,"Microfinance, Insurance",Financial advisor,2,2,2,3,3,3,3,4,3,4,Yes,Same
+190,18-24,Male,Master's,Business owner,"Below 25,000",5+ years,"50,000-200,000",Weekly,Insurance,Financial news,5,3,1,2,2,3,2,2,3,3,Not sure,Higher
+191,25-34,Female,Bachelor's,Unemployed,"25,000-50,000",<1 year,"Above 1,000,000",A few times a year,"Insurance, Hotels, Microfinance",TMS/broker app,4,3,4,5,4,4,4,4,5,4,Yes,Same
+192,35-44,Female,Bachelor's,Business owner,"50,000-100,000",3-5 years,"Below 50,000",Monthly,"Banking, Manufacturing, Insurance",Friends & family,3,3,3,4,3,3,4,2,4,1,No,Higher
+193,18-24,Male,Bachelor's,Student,"25,000-50,000",<1 year,"50,000-200,000",Daily,"Banking, Hotels, Insurance",TMS/broker app,5,3,4,4,3,4,4,5,3,5,No,Much higher
+194,25-34,Male,Master's,Salaried employee,"Above 100,000",1-3 years,"Below 50,000",Monthly,"Insurance, Manufacturing, Hotels",Financial news,3,4,2,5,4,4,4,5,2,4,No,Much higher
+195,18-24,Male,Bachelor's,Business owner,"25,000-50,000",<1 year,"Below 50,000",Weekly,"Hotels, Manufacturing, Insurance",Financial news,4,4,3,4,5,3,3,4,4,4,Break-even,Lower
+196,18-24,Male,Bachelor's,Self-employed,"25,000-50,000",<1 year,"Below 50,000",Monthly,Hotels,TMS/broker app,5,4,4,5,5,4,4,2,4,4,Break-even,Higher
+197,35-44,Male,Bachelor's,Business owner,"25,000-50,000",1-3 years,"Below 50,000",Daily,Banking,ShareSansar/MeroLagani,5,2,4,5,5,4,4,2,2,5,Yes,Much higher
+198,25-34,Male,Bachelor's,Salaried employee,"50,000-100,000",5+ years,"50,000-200,000",Rarely,"Hydropower, Microfinance",TMS/broker app,2,1,3,4,3,4,4,2,2,2,No,Same
+199,25-34,Male,Bachelor's,Unemployed,"50,000-100,000",<1 year,"500,000-1,000,000",Weekly,Insurance,ShareSansar/MeroLagani,3,5,4,3,5,5,4,3,5,5,Break-even,Much higher
+200,45-54,Male,Bachelor's,Student,"Below 25,000",<1 year,"Below 50,000",Weekly,"Hydropower, Hotels, Manufacturing",Friends & family,4,4,5,4,5,4,4,5,4,2,Yes,Higher
+201,18-24,Male,Bachelor's,Business owner,"25,000-50,000",5+ years,"50,000-200,000",Rarely,"Hotels, Microfinance",Financial advisor,4,1,2,3,2,2,2,2,2,3,No,Same
+202,55+,Female,Bachelor's,Student,"25,000-50,000",5+ years,"Below 50,000",Monthly,Microfinance,Friends & family,2,3,1,2,4,3,4,2,2,1,Break-even,Higher
+203,18-24,Female,Bachelor's,Self-employed,"Below 25,000",5+ years,"200,000-500,000",Monthly,Manufacturing,Social media,2,3,4,3,2,3,1,2,2,3,No,Higher
+204,25-34,Male,Bachelor's,Salaried employee,"25,000-50,000",<1 year,"500,000-1,000,000",Monthly,"Hydropower, Insurance, Microfinance",Friends & family,5,3,5,4,2,4,4,3,4,3,No,Higher
+205,18-24,Female,Bachelor's,Student,"50,000-100,000",3-5 years,"50,000-200,000",Weekly,Banking,Financial advisor,3,2,3,1,3,3,3,3,2,1,Break-even,Higher
+206,55+,Male,Bachelor's,Salaried employee,"25,000-50,000",3-5 years,"Below 50,000",Daily,"Microfinance, Hotels, Manufacturing",Social media,3,4,3,2,3,4,2,3,2,1,Not sure,Higher
+207,25-34,Male,PhD,Salaried employee,"25,000-50,000",<1 year,"50,000-200,000",A few times a year,Insurance,Social media,4,3,5,4,4,5,3,4,4,4,No,Higher
+208,18-24,Female,High school,Business owner,"50,000-100,000",<1 year,"50,000-200,000",Monthly,Insurance,Friends & family,4,4,4,3,4,3,4,5,5,2,Yes,Much lower
+209,25-34,Male,Master's,Salaried employee,"25,000-50,000",3-5 years,"50,000-200,000",Weekly,"Microfinance, Insurance",TMS/broker app,3,2,2,2,1,4,4,3,3,5,Not sure,Same
+210,25-34,Male,PhD,Student,"50,000-100,000",<1 year,"200,000-500,000",Weekly,Hotels,Social media,5,3,4,4,2,5,4,5,3,4,Not sure,Lower
+211,18-24,Male,Bachelor's,Salaried employee,"50,000-100,000",5+ years,"Below 50,000",Monthly,"Hydropower, Manufacturing, Insurance",Financial news,2,3,2,1,3,3,2,3,2,2,Yes,Same
+212,18-24,Male,High school,Student,"Below 25,000",<1 year,"50,000-200,000",Monthly,"Hotels, Insurance, Hydropower",ShareSansar/MeroLagani,5,4,4,4,4,5,4,4,4,5,No,Same
+213,25-34,Male,Bachelor's,Self-employed,Prefer not to say,<1 year,"Below 50,000",Monthly,"Insurance, Hydropower",ShareSansar/MeroLagani,3,3,5,5,4,2,4,4,4,3,Not sure,Lower
+214,35-44,Male,Bachelor's,Salaried employee,"25,000-50,000",<1 year,"Below 50,000",A few times a year,Hydropower,Financial news,4,3,4,4,4,5,4,3,4,4,No,Lower
+215,35-44,Male,High school,Student,"Below 25,000",5+ years,"50,000-200,000",Rarely,"Banking, Insurance",Financial news,2,3,4,2,3,2,3,3,4,3,No,Higher
+216,45-54,Male,Bachelor's,Salaried employee,"25,000-50,000",1-3 years,"Below 50,000",Daily,"Banking, Microfinance",Social media,3,5,3,4,4,5,3,4,3,5,No,Much lower
+217,35-44,Male,Master's,Student,"Above 100,000",1-3 years,"50,000-200,000",Weekly,Microfinance,Financial news,5,5,4,4,4,4,4,5,3,4,Yes,Much higher
+218,18-24,Male,Master's,Salaried employee,"Below 25,000",5+ years,"Below 50,000",Weekly,"Banking, Manufacturing",ShareSansar/MeroLagani,3,4,2,3,3,3,4,3,3,2,Yes,Much higher
+219,25-34,Female,Bachelor's,Salaried employee,Prefer not to say,1-3 years,"Above 1,000,000",Weekly,Hydropower,Financial news,4,3,4,4,4,3,4,5,4,5,Yes,Higher
+220,18-24,Other,Master's,Salaried employee,Prefer not to say,<1 year,"200,000-500,000",A few times a year,Banking,TMS/broker app,3,4,4,3,5,5,3,3,4,5,No,Much higher

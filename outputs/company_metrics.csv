@@ -1,0 +1,11 @@
+ticker,sector,start_price,latest_price,total_return_pct,volatility_pct,avg_daily_volume,n_trading_days
+NHPC,Hydropower,317.0,269.0,-15.14,3.03,210432.0,1161
+UPPER,Hydropower,699.0,199.0,-71.53,2.61,165770.0,1161
+HIDCL,Investment,464.0,264.8,-42.93,2.54,190053.0,1161
+ALICL,Insurance,1408.0,433.7,-69.2,2.28,37179.0,1161
+NLIC,Insurance,1967.8,769.9,-60.88,1.89,50108.0,1161
+CHCL,Hydropower,694.0,487.0,-29.83,1.88,52492.0,1161
+NTC,Telecom,1318.0,862.0,-34.6,1.86,37566.0,1159
+SANIMA,Banking,515.0,361.0,-29.9,1.74,85392.0,1161
+ADBL,Banking,508.0,311.0,-38.78,1.66,50114.0,1161
+NABIL,Banking,1440.0,542.7,-62.31,1.58,71857.0,1161

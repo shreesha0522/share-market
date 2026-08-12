@@ -1,0 +1,365 @@
+"""
+analysis.py
+
+Core analysis pipeline for:
+"Analysis and Identification of Challenges Faced by New Investors in the
+Share Market Using Survey-Based and Market Data Analysis"
+
+Produces:
+1. Cleaned market dataset with computed returns/volatility per company
+2. Survey analysis: challenge scores by investor segment
+3. Charts (PNG) for the thesis report
+4. A single JSON file (website/data.json) that powers the website dashboard
+"""
+
+import json
+import os
+
+import numpy as np
+import pandas as pd
+
+MARKET_DIR = "/home/claude/thesis_project/data/market"
+SURVEY_PATH = "/home/claude/thesis_project/data/survey/survey_synthetic.csv"
+CHARTS_DIR = "/home/claude/thesis_project/outputs/charts"
+WEBSITE_DATA = "/home/claude/thesis_project/website/data.json"
+
+os.makedirs(CHARTS_DIR, exist_ok=True)
+os.makedirs(os.path.dirname(WEBSITE_DATA), exist_ok=True)
+
+SECTOR_MAP = {
+    "NABIL": "Banking", "ADBL": "Banking", "SANIMA": "Banking",
+    "NHPC": "Hydropower", "CHCL": "Hydropower", "UPPER": "Hydropower",
+    "NLIC": "Insurance", "ALICL": "Insurance",
+    "HIDCL": "Investment",
+    "NTC": "Telecom",
+}
+
+# ---------------------------------------------------------------------
+# 1. MARKET DATA: load, clean, compute metrics
+# ---------------------------------------------------------------------
+
+def load_market_data():
+    frames = []
+    for ticker, sector in SECTOR_MAP.items():
+        path = os.path.join(MARKET_DIR, f"{ticker}.csv")
+        df = pd.read_csv(path)
+        df["published_date"] = pd.to_datetime(df["published_date"], errors="coerce")
+        df = df.dropna(subset=["published_date", "close"])
+        df = df.sort_values("published_date")
+        df["ticker"] = ticker
+        df["sector"] = sector
+        # daily return
+        df["daily_return_pct"] = df["close"].pct_change() * 100
+        frames.append(df)
+    all_data = pd.concat(frames, ignore_index=True)
+    return all_data
+
+
+def compute_company_metrics(all_data, recent_years=5):
+    cutoff = all_data["published_date"].max() - pd.DateOffset(years=recent_years)
+    recent = all_data[all_data["published_date"] >= cutoff]
+
+    metrics = []
+    for ticker, group in recent.groupby("ticker"):
+        group = group.sort_values("published_date")
+        total_return = (group["close"].iloc[-1] / group["close"].iloc[0] - 1) * 100
+        volatility = group["daily_return_pct"].std()
+        avg_daily_volume = group["traded_quantity"].mean()
+        metrics.append({
+            "ticker": ticker,
+            "sector": SECTOR_MAP[ticker],
+            "start_price": round(float(group["close"].iloc[0]), 2),
+            "latest_price": round(float(group["close"].iloc[-1]), 2),
+            "total_return_pct": round(float(total_return), 2),
+            "volatility_pct": round(float(volatility), 2),
+            "avg_daily_volume": round(float(avg_daily_volume), 0),
+            "n_trading_days": int(len(group)),
+        })
+    return pd.DataFrame(metrics).sort_values("volatility_pct", ascending=False)
+
+
+def compute_sector_metrics(company_metrics):
+    return (
+        company_metrics.groupby("sector")
+        .agg(
+            avg_return_pct=("total_return_pct", "mean"),
+            avg_volatility_pct=("volatility_pct", "mean"),
+            n_companies=("ticker", "count"),
+        )
+        .round(2)
+        .reset_index()
+        .sort_values("avg_volatility_pct", asce    )
+
+
+# ---------------------------------------------------------------------
+# 2. SURVEY DATA: challenge analysis
+# ---------------------------------------------------------------------
+
+CHALLENGE_COLS = [
+    "lacks_knowledge", "hard_to_access_info", "volatility_difficulty",
+    "broker_platform_issues", "regulatory_confusion", "emotional_control",
+    "limited_capital", "misled_by_rumors", "ipo_process_confusing", "lacks_mentorship",
+]
+
+CHALLENGE_LABELS = {
+    "lacks_knowledge": "Lack of financial knowledge",
+    "hard_to_access_info": "Hard to access reliable info",
+    "volatility_difficulty": "Market volatility difficulty",
+    "broker_platform_issues": "Broker/TMS platform issues",
+    "regulatory_confusion": "Regulatory/tax confusion",
+    "emotional_control": "Emotional control (fear/greed)",
+    "limited_capital": "Limited capital",
+    "misled_by_rumors": "Misled by rumors/tips",
+    "ipo_process_confusing": "IPO/rights process confusion",
+    "lacks_mentorship": "Lack of mentorship",
+}
+
+
+def analyze_survey():
+    df = pd.read_csv(SURVEY_PATH)
+
+    overall_scores = df[CHALLENGE_COLS].mean().round(2)
+    ranked = overall_scores.sort_values(ascending=False)
+    ranked_named = [
+        {"challenge": CHALLENGE_LABELS[k], "avg_score": float(v)}
+        for k, v in ranked.items()
+    ]
+
+    # challenge score by experience level (new vs experienced investors)
+    df["overall_challenge_score"] = df[CHALLENGE_COLS].mean(axis=1)
+    by_experience = (
+        df.groupby("years_investing")["overall_challenge_score"]
+        .mean()
+        .round(2)
+        .reindex(["<1 year", "1-3 years", "3-5 years", "5+ years"])
+        .reset_index()
+        .rename(columns={"years_investing": "experience", "overall_challenge_score": "avg_challenge_score"})
+    )
+
+    by_age = (
+        df.groupby("age_group")["overall_challenge_score"]
+        .mean()
+        .round(2)
+        .reset_index()
+        .rename(columns={"age_group": "segment", "overall_challenge_score": "avg_challenge_score"})
+    )
+
+    profitability = df["profitable_experience"].value_counts(normalize=True).mul(100).round(1)
+    confidence = df["confidence_change"].value_counts(normalize=True).mul(100).round(1)
+
+    return {
+        "n_respondents": int(len(df)),
+        "ranked_challenges": ranked_named,
+        "by_experience": by_experience.to_dict(orient="records"),
+        "by_age": by_age.to_dict(orient="records"),
+        "profitability_pct": profitability.to_dict(),
+        "confidence_change_pct": confidence.to_dict(),
+    }
+
+
+# ---------------------------------------------------------------------
+# 2b. STATISTICAL ANALYSIS: correlation + regression
+# (This is the part your ethics approval calls "correlation and regression
+# analysis" and "comparative analysis using secondary market data" — it
+# links the survey side to the market side, not just describing each alone.)
+# ---------------------------------------------------------------------
+
+EXPERIENCE_ORDER = {"<1 year": 1, "1-3 years": 2, "3-5 years": 3, "5+ years": 4}
+PORTFOLIO_ORDER = {
+    "Below 50,000": 1, "50,000-200,000": 2, "200,000-500,000": 3,
+    "500,000-1,000,000": 4, "Above 1,000,000": 5,
+}
+TRADE_FREQ_ORDER = {"Rarely": 1, "A few times a year": 2, "Monthly": 3, "Weekly": 4, "Daily": 5}
+
+
+def statistical_analysis(sector_metrics):
+    import statsmodels.api as sm
+    from scipy import stats
+
+    df = pd.read_csv(SURVEY_PATH)
+    df["overall_challenge_score"] = df[CHALLENGE_COLS].mean(axis=1)
+
+    # ---- encode ordinal variables numerically ----
+    df["experience_ordinal"] = df["years_investing"].map(EXPERIENCE_ORDER)
+    df["portfolio_ordinal"] = df["portfolio_size"].map(PORTFOLIO_ORDER)
+    df["trade_freq_ordinal"] = df["trade_frequency"].map(TRADE_FREQ_ORDER)
+
+    # ---- 1. Correlation: experience vs overall challenge score ----
+    corr_exp, p_exp = stats.pearsonr(df["experience_ordinal"], df["overall_challenge_score"])
+
+    # ---- 2. Correlation matrix across the 10 challenge items ----
+    corr_matrix = df[CHALLENGE_COLS].corr().round(2)
+
+    # ---- 3. Link survey respondents to REAL market volatility ----
+    # For each respondent, average the volatility of the sectors they say they invest in.
+    sector_vol_lookup = sector_metrics.set_index("sector")["avg_volatility_pct"].to_dict()
+
+    def avg_exposure_volatility(sectors_str):
+        sectors = [s.strip() for s in str(sectors_str).split(",")]
+        vols = [sector_vol_lookup[s] for s in sectors if s in sector_vol_lookup]
+        return np.mean(vols) if vols else np.nan
+
+    df["exposure_volatility"] = df["sectors_invested"].apply(avg_exposure_volatility)
+    valid = df.dropna(subset=["exposure_volatility"])
+    corr_vol, p_vol = stats.pearsonr(valid["exposure_volatility"], valid["volatility_difficulty"])
+
+    # ---- 4. Multiple linear regression ----
+    # Predicts overall challenge score from experience, portfolio size, and trade frequency.
+    X = df[["experience_ordinal", "portfolio_ordinal", "trade_freq_ordinal"]]
+    X = sm.add_constant(X)
+    y = df["overall_challenge_score"]
+    model = sm.OLS(y, X).fit()
+
+    regression_summary = {
+        "r_squared": round(float(model.rsquared), 3),
+        "coefficients": {
+            name: {"coef": round(float(model.params[name]), 4), "p_value": round(float(model.pvalues[name]), 4)}
+            for name in X.columns
+        },
+    }
+
+    return {
+        "experience_vs_challenge_correlation": {"r": round(float(corr_exp), 3), "p_value": round(float(p_exp), 4)},
+        "volatility_vs_perceived_difficulty_correlation": {"r": round(float(corr_vol), 3), "p_value": round(float(p_vol), 4)},
+        "challenge_item_correlation_matrix": corr_matrix.to_dict(),
+        "regression": regression_summary,
+    }
+
+
+# ---------------------------------------------------------------------
+# 3. CHARTS (for thesis report / notebook)
+# ---------------------------------------------------------------------
+
+def make_charts(company_metrics, sector_metrics, survey_summary):
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    plt.style.use("seaborn-v0_8-whitegrid")
+
+    # Chart 1: volatility by company
+    fig, ax = plt.subplots(figsize=(9, 5))
+    cm = company_metrics.sort_values("volatility_pct")
+    ax.barh(cm["ticker"], cm["volatility_pct"], color="#3b6ea5")
+    ax.set_xlabel("Daily Return Volatility (%)")
+    ax.set_title("NEPSE: 5-Year Volatility by Company")
+    plt.tight_layout()
+    fig.savefig(f"{CHARTS_DIR}/volatility_by_company.png", dpi=150)
+    plt.close(fig)
+
+    # Chart 2: sector avg return vs volatility
+    fig, ax = plt.subplots(figsize=(7, 6))
+    ax.scatter(sector_metrics["avg_volatility_pct"], sector_metrics["avg_return_pct"], s=120, color="#c0562e")
+    for _, r in sector_metrics.iterrows():
+        ax.annotate(r["sector"], (r["avg_volatility_pct"], r["avg_return_pct"]), textcoords="offset points", xytext=(6, 4))
+    ax.set_xlabel("Avg Volatility (%)")
+    ax.set_ylabel("Avg 5yr Return (%)")
+    ax.set_title("Sector Risk vs Return")
+    plt.tight_layout()
+    fig.savefig(f"{CHARTS_DIR}/sector_risk_return.png", dpi=150)
+    plt.close(fig)
+
+    # Chart 3: survey challenge ranking
+    fig, ax = plt.subplots(figsize=(9, 5))
+    challenges = [c["challenge"] for c in survey_summary["ranked_challenges"]]
+    scores = [c["avg_score"] for c in survey_summary["ranked_challenges"]]
+    ax.barh(challenges[::-1], scores[::-1], color="#4a8c6f")
+    ax.set_xlabel("Average Agreement Score (1-5)")
+    ax.set_title("Investor-Reported Challenges (Ranked)")
+    ax.set_xlim(0, 5)
+    plt.tight_layout()
+    fig.savefig(f"{CHARTS_DIR}/survey_challenge_ranking.png", dpi=150)
+    plt.close(fig)
+
+    # Chart 4: challenge score by experience
+    fig, ax = plt.subplots(figsize=(7, 5))
+    be = pd.DataFrame(survey_summary["by_experience"])
+    ax.bar(be["experience"], be["avg_challenge_score"], color="#8a5fbf")
+    ax.set_ylabel("Avg Challenge Score (1-5)")
+    ax.set_title("Challenge Score by Investing Experience")
+    plt.tight_layout()
+    fig.savefig(f"{CHARTS_DIR}/challenge_by_experience.png", dpi=150)
+    plt.close(fig)
+
+    print("Charts saved to", CHARTS_DIR)
+
+
+def make_stats_chart(stats_results):
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    plt.style.use("seaborn-v0_8-whitegrid")
+
+    corr_df = pd.DataFrame(stats_results["challenge_item_correlation_matrix"])
+    fig, ax = plt.subplots(figsize=(9, 8))
+    im = ax.imshow(corr_df.values, cmap="RdBu_r", vmin=-1, vmax=1)
+    ax.set_xticks(range(len(corr_df.columns)))
+    ax.set_yticks(range(len(corr_df.columns)))
+    short_labels = [CHALLENGE_LABELS[c][:20] for c in corr_df.columns]
+    ax.set_xticklabels(short_labels, rotation=90, fontsize=8)
+    ax.set_yticklabels(short_labels, fontsize=8)
+    for i in range(len(corr_df)):
+        for j in range(len(corr_df)):
+            ax.text(j, i, f"{corr_df.values[i, j]:.2f}", ha="center", va="center", fontsize=6)
+    ax.set_title("Correlation Between Challenge Items")
+    fig.colorbar(im, ax=ax, shrink=0.8)
+    plt.tight_layout()
+    fig.savefig(f"{CHARTS_DIR}/challenge_correlation_heatmap.png", dpi=150)
+    plt.close(fig)
+    print("Correlation heatmap saved.")
+
+
+# ---------------------------------------------------------------------
+# MAIN
+# ---------------------------------------------------------------------
+
+def main():
+    print("Loading market data...")
+    all_data = load_market_data()
+    company_metrics = compute_company_metrics(all_data)
+    sector_metrics = compute_sector_metrics(company_metrics)
+
+    print("\nCompany metrics:\n", company_metrics.to_string(index=False))
+    print("\nSector metrics:\n", sector_metrics.to_string(index=False))
+
+    print("\nAnalyzing survey data (SYNTHETIC placeholder)...")
+    survey_summary = analyze_survey()
+    print("\nRanked challenges (synthetic):")
+    for c in survey_summary["ranked_challenges"]:
+        print(f"  {c['challenge']}: {c['avg_score']}")
+
+    print("\nRunning correlation & regression analysis...")
+    stats_results = statistical_analysis(sector_metrics)
+    print(f"  Experience vs challenge score: r={stats_results['experience_vs_challenge_correlation']['r']}, "
+          f"p={stats_results['experience_vs_challenge_correlation']['p_value']}")
+    print(f"  Sector volatility vs perceived difficulty: r={stats_results['volatility_vs_perceived_difficulty_correlation']['r']}, "
+          f"p={stats_results['volatility_vs_perceived_difficulty_correlation']['p_value']}")
+    print(f"  Regression R²: {stats_results['regression']['r_squared']}")
+    for name, c in stats_results["regression"]["coefficients"].items():
+        print(f"    {name}: coef={c['coef']}, p={c['p_value']}")
+
+    make_charts(company_metrics, sector_metrics, survey_summary)
+    make_stats_chart(stats_results)
+
+    # Save cleaned market data for reuse
+    company_metrics.to_csv("/home/claude/thesis_project/outputs/company_metrics.csv", index=False)
+    sector_metrics.to_csv("/home/claude/thesis_project/outputs/sector_metrics.csv", index=False)
+
+    # Save combined JSON for the website
+    website_data = {
+        "is_survey_synthetic": True,
+        "generated_note": "Survey data is SYNTHETIC placeholder data for pipeline testing. Replace with real Google Forms responses.",
+        "company_metrics": company_metrics.to_dict(orient="records"),
+        "sector_metrics": sector_metrics.to_dict(orient="records"),
+        "survey": survey_summary,
+        "statistical_analysis": stats_results,
+    }
+    with open(WEBSITE_DATA, "w") as f:
+        json.dump(website_data, f, indent=2)
+    print(f"\nWebsite data written to {WEBSITE_DATA}")
+
+
+if __name__ == "__main__":
+    main()

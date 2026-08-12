@@ -1,0 +1,472 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NEPSE Investor Challenges — Thesis Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg: #0c1720;
+    --panel: #121f2b;
+    --panel-border: #24384a;
+    --ink: #e7edf2;
+    --ink-dim: #8fa3b3;
+    --amber: #e0a458;
+    --teal: #5b9c95;
+    --red: #c1666b;
+    --mono: 'IBM Plex Mono', 'Courier New', monospace;
+    --serif: 'Source Serif 4', Georgia, serif;
+    --sans: 'Inter', -apple-system, sans-serif;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap');
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.6;
+  }
+
+  /* ---- ticker tape ---- */
+  .ticker-wrap{
+    background:#0a1319;
+    border-bottom:1px solid var(--panel-border);
+    overflow:hidden;
+    white-space:nowrap;
+    padding:10px 0;
+  }
+  .ticker{
+    display:inline-block;
+    padding-left:100%;
+    animation: scroll-left 38s linear infinite;
+    font-family:var(--mono);
+    font-size:13px;
+  }
+  .ticker span{ margin-right:40px; }
+  .ticker .neg{ color:var(--red); }
+  .ticker .pos{ color:#7fb87a; }
+  @keyframes scroll-left{
+    0%{ transform: translateX(0); }
+    100%{ transform: translateX(-100%); }
+  }
+
+  header.hero{
+    max-width:980px;
+    margin:0 auto;
+    padding:64px 24px 48px;
+  }
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:0.12em;
+    color:var(--amber);
+    text-transform:uppercase;
+    margin-bottom:18px;
+  }
+  h1{
+    font-family:var(--serif);
+    font-weight:700;
+    font-size:clamp(28px,4.2vw,46px);
+    line-height:1.15;
+    max-width:820px;
+    color:#fff;
+  }
+  .subtitle{
+    margin-top:20px;
+    color:var(--ink-dim);
+    font-size:17px;
+    max-width:640px;
+  }
+  .badge-row{
+    margin-top:28px;
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+  .badge{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--ink-dim);
+    border:1px solid var(--panel-border);
+    padding:6px 12px;
+    border-radius:2px;
+  }
+
+  section{
+    max-width:980px;
+    margin:0 auto;
+    padding:36px 24px;
+  }
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+    margin-bottom:22px;
+    border-bottom:1px solid var(--panel-border);
+    padding-bottom:14px;
+  }
+  .section-num{
+    font-family:var(--mono);
+    color:var(--amber);
+    font-size:13px;
+  }
+  h2{
+    font-family:var(--serif);
+    font-size:24px;
+    font-weight:600;
+    color:#fff;
+  }
+  .section-desc{
+    color:var(--ink-dim);
+    font-size:14.5px;
+    max-width:680px;
+    margin-bottom:24px;
+  }
+
+  .grid-2{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:24px;
+  }
+  @media (max-width: 760px){ .grid-2{ grid-template-columns: 1fr; } }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--panel-border);
+    border-radius:4px;
+    padding:22px;
+  }
+  .panel h3{
+    font-family:var(--mono);
+    font-size:12.5px;
+    letter-spacing:0.05em;
+    color:var(--ink-dim);
+    text-transform:uppercase;
+    margin-bottom:16px;
+  }
+  canvas{ max-height:320px; }
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  th, td{
+    text-align:left;
+    padding:9px 6px;
+    border-bottom:1px solid var(--panel-border);
+  }
+  th{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:0.04em;
+    color:var(--ink-dim);
+    text-transform:uppercase;
+    font-weight:500;
+  }
+  td.num{ font-family:var(--mono); text-align:right; }
+  td.neg{ color:var(--red); }
+  td.pos{ color:#7fb87a; }
+
+  .note-flag{
+    display:inline-block;
+    background:rgba(224,164,88,0.12);
+    border:1px solid rgba(224,164,88,0.4);
+    color:var(--amber);
+    font-family:var(--mono);
+    font-size:11.5px;
+    padding:8px 14px;
+    border-radius:3px;
+    margin-bottom:20px;
+  }
+
+  .stat-strip{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:16px;
+    margin-top:8px;
+  }
+  @media (max-width:760px){ .stat-strip{ grid-template-columns:repeat(2,1fr); } }
+  .stat{
+    background:var(--panel);
+    border:1px solid var(--panel-border);
+    border-radius:4px;
+    padding:18px;
+  }
+  .stat .num{
+    font-family:var(--mono);
+    font-size:26px;
+    color:#fff;
+  }
+  .stat .label{
+    color:var(--ink-dim);
+    font-size:12.5px;
+    margin-top:6px;
+  }
+
+  footer{
+    max-width:980px;
+    margin:0 auto;
+    padding:40px 24px 80px;
+    color:var(--ink-dim);
+    font-size:13px;
+    border-top:1px solid var(--panel-border);
+    margin-top:20px;
+  }
+  footer a{ color:var(--teal); }
+</style>
+</head>
+<body>
+
+<div class="ticker-wrap"><div class="ticker" id="tickerTape"></div></div>
+
+<header class="hero">
+  <div class="eyebrow">Undergraduate Thesis — Data Dashboard</div>
+  <h1>Challenges Faced by New Investors in the Nepal Share Market</h1>
+  <p class="subtitle">A mixed-methods analysis combining survey-reported investor challenges with five years of NEPSE trading data across banking, hydropower, insurance, telecom, and investment sectors.</p>
+  <div class="badge-row">
+    <div class="badge" id="badgeCompanies">10 companies tracked</div>
+    <div class="badge" id="badgeRespondents">220 survey respondents</div>
+    <div class="badge">NEPSE · 2021–2026</div>
+  </div>
+</header>
+
+<div class="ticker-wrap" style="display:none"></div>
+
+<section>
+  <div class="section-head">
+    <span class="section-num">01</span>
+    <h2>Market Data — Risk &amp; Return by Company</h2>
+  </div>
+  <p class="section-desc">Five-year total return and daily-return volatility for each tracked company, computed from real NEPSE historical trading data.</p>
+
+  <div class="grid-2">
+    <div class="panel">
+      <h3>Volatility by Company</h3>
+      <canvas id="volChart"></canvas>
+    </div>
+    <div class="panel">
+      <h3>Sector Risk vs. Return</h3>
+      <canvas id="scatterChart"></canvas>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:24px;">
+    <h3>Company Metrics Table</h3>
+    <table id="companyTable">
+      <thead><tr><th>Ticker</th><th>Sector</th><th>5yr Return</th><th>Volatility</th><th>Avg Daily Vol.</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="section-head">
+    <span class="section-num">02</span>
+    <h2>Survey Findings — Investor-Reported Challenges</h2>
+  </div>
+  <div class="note-flag" id="synthNote"></div>
+  <p class="section-desc">Ranked average agreement scores (1–5 scale) across ten challenge categories, and how the overall challenge score varies by investing experience.</p>
+
+  <div class="grid-2">
+    <div class="panel">
+      <h3>Challenge Ranking</h3>
+      <canvas id="challengeChart"></canvas>
+    </div>
+    <div class="panel">
+      <h3>Challenge Score by Experience</h3>
+      <canvas id="experienceChart"></canvas>
+    </div>
+  </div>
+
+  <div class="stat-strip" id="statStrip"></div>
+</section>
+
+<section>
+  <div class="section-head">
+    <span class="section-num">03</span>
+    <h2>Statistical Analysis — Correlation &amp; Regression</h2>
+  </div>
+  <p class="section-desc">Linking survey-reported challenges to investing experience and to real NEPSE sector volatility, as specified in the approved research methodology.</p>
+
+  <div class="stat-strip" id="statsStrip2" style="margin-bottom:24px;"></div>
+
+  <div class="panel">
+    <h3>Regression: What Predicts Overall Challenge Score?</h3>
+    <table id="regressionTable">
+      <thead><tr><th>Predictor</th><th>Coefficient</th><th>p-value</th><th>Significant?</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <p style="color:var(--ink-dim); font-size:13px; margin-top:14px;" id="regressionNote"></p>
+  </div>
+</section>
+
+<section>
+  <div class="section-head">
+    <span class="section-num">04</span>
+    <h2>Methodology Note</h2>
+  </div>
+  <p class="section-desc">
+    Market data: daily OHLC trading records for 10 companies across 5 sectors, sourced from NEPSE via a public historical data archive, cleaned and aggregated in Python (pandas). Volatility = standard deviation of daily percentage returns; total return = 5-year price change.
+    Survey data: structured questionnaire (see <code>survey_questionnaire.md</code>) covering demographics, investment profile, and 10 Likert-scale challenge items, distributed via Google Forms. The chart above uses <strong>synthetic placeholder data</strong> until real responses are collected — swap in the exported CSV and rerun <code>analysis.py</code> to refresh every number and chart on this page automatically.
+  </p>
+</section>
+
+<footer>
+  Built with Python (pandas, matplotlib) for the analysis pipeline and this static dashboard for presentation. Data pipeline: <code>scripts/analysis.py</code> → <code>website/data.json</code> → this page.
+</footer>
+
+<script>
+const DATA = {"is_survey_synthetic": true, "generated_note": "Survey data is SYNTHETIC placeholder data for pipeline testing. Replace with real Google Forms responses.", "company_metrics": [{"ticker": "NHPC", "sector": "Hydropower", "start_price": 317.0, "latest_price": 269.0, "total_return_pct": -15.14, "volatility_pct": 3.03, "avg_daily_volume": 210432.0, "n_trading_days": 1161}, {"ticker": "UPPER", "sector": "Hydropower", "start_price": 699.0, "latest_price": 199.0, "total_return_pct": -71.53, "volatility_pct": 2.61, "avg_daily_volume": 165770.0, "n_trading_days": 1161}, {"ticker": "HIDCL", "sector": "Investment", "start_price": 464.0, "latest_price": 264.8, "total_return_pct": -42.93, "volatility_pct": 2.54, "avg_daily_volume": 190053.0, "n_trading_days": 1161}, {"ticker": "ALICL", "sector": "Insurance", "start_price": 1408.0, "latest_price": 433.7, "total_return_pct": -69.2, "volatility_pct": 2.28, "avg_daily_volume": 37179.0, "n_trading_days": 1161}, {"ticker": "NLIC", "sector": "Insurance", "start_price": 1967.8, "latest_price": 769.9, "total_return_pct": -60.88, "volatility_pct": 1.89, "avg_daily_volume": 50108.0, "n_trading_days": 1161}, {"ticker": "CHCL", "sector": "Hydropower", "start_price": 694.0, "latest_price": 487.0, "total_return_pct": -29.83, "volatility_pct": 1.88, "avg_daily_volume": 52492.0, "n_trading_days": 1161}, {"ticker": "NTC", "sector": "Telecom", "start_price": 1318.0, "latest_price": 862.0, "total_return_pct": -34.6, "volatility_pct": 1.86, "avg_daily_volume": 37566.0, "n_trading_days": 1159}, {"ticker": "SANIMA", "sector": "Banking", "start_price": 515.0, "latest_price": 361.0, "total_return_pct": -29.9, "volatility_pct": 1.74, "avg_daily_volume": 85392.0, "n_trading_days": 1161}, {"ticker": "ADBL", "sector": "Banking", "start_price": 508.0, "latest_price": 311.0, "total_return_pct": -38.78, "volatility_pct": 1.66, "avg_daily_volume": 50114.0, "n_trading_days": 1161}, {"ticker": "NABIL", "sector": "Banking", "start_price": 1440.0, "latest_price": 542.7, "total_return_pct": -62.31, "volatility_pct": 1.58, "avg_daily_volume": 71857.0, "n_trading_days": 1161}], "sector_metrics": [{"sector": "Investment", "avg_return_pct": -42.93, "avg_volatility_pct": 2.54, "n_companies": 1}, {"sector": "Hydropower", "avg_return_pct": -38.83, "avg_volatility_pct": 2.51, "n_companies": 3}, {"sector": "Insurance", "avg_return_pct": -65.04, "avg_volatility_pct": 2.08, "n_companies": 2}, {"sector": "Telecom", "avg_return_pct": -34.6, "avg_volatility_pct": 1.86, "n_companies": 1}, {"sector": "Banking", "avg_return_pct": -43.66, "avg_volatility_pct": 1.66, "n_companies": 3}], "survey": {"n_respondents": 220, "ranked_challenges": [{"challenge": "Lack of financial knowledge", "avg_score": 3.56}, {"challenge": "Emotional control (fear/greed)", "avg_score": 3.45}, {"challenge": "Limited capital", "avg_score": 3.45}, {"challenge": "Hard to access reliable info", "avg_score": 3.42}, {"challenge": "Misled by rumors/tips", "avg_score": 3.42}, {"challenge": "Market volatility difficulty", "avg_score": 3.4}, {"challenge": "IPO/rights process confusion", "avg_score": 3.4}, {"challenge": "Regulatory/tax confusion", "avg_score": 3.4}, {"challenge": "Lack of mentorship", "avg_score": 3.39}, {"challenge": "Broker/TMS platform issues", "avg_score": 3.35}], "by_experience": [{"experience": "<1 year", "avg_challenge_score": 3.93}, {"experience": "1-3 years", "avg_challenge_score": 3.92}, {"experience": "3-5 years", "avg_challenge_score": 2.83}, {"experience": "5+ years", "avg_challenge_score": 2.68}], "by_age": [{"segment": "18-24", "avg_challenge_score": 3.39}, {"segment": "25-34", "avg_challenge_score": 3.47}, {"segment": "35-44", "avg_challenge_score": 3.38}, {"segment": "45-54", "avg_challenge_score": 3.53}, {"segment": "55+", "avg_challenge_score": 3.39}], "profitability_pct": {"Yes": 34.5, "No": 33.2, "Break-even": 18.2, "Not sure": 14.1}, "confidence_change_pct": {"Higher": 40.0, "Same": 21.8, "Much higher": 17.7, "Lower": 16.4, "Much lower": 4.1}}, "statistical_analysis": {"experience_vs_challenge_correlation": {"r": -0.839, "p_value": 0.0}, "volatility_vs_perceived_difficulty_correlation": {"r": -0.018, "p_value": 0.8155}, "challenge_item_correlation_matrix": {"lacks_knowledge": {"lacks_knowledge": 1.0, "hard_to_access_info": 0.26, "volatility_difficulty": 0.34, "broker_platform_issues": 0.28, "regulatory_confusion": 0.25, "emotional_control": 0.25, "limited_capital": 0.17, "misled_by_rumors": 0.28, "ipo_process_confusing": 0.23, "lacks_mentorship": 0.25}, "hard_to_access_info": {"lacks_knowledge": 0.26, "hard_to_access_info": 1.0, "volatility_difficulty": 0.25, "broker_platform_issues": 0.27, "regulatory_confusion": 0.38, "emotional_control": 0.23, "limited_capital": 0.19, "misled_by_rumors": 0.24, "ipo_process_confusing": 0.29, "lacks_mentorship": 0.22}, "volatility_difficulty": {"lacks_knowledge": 0.34, "hard_to_access_info": 0.25, "volatility_difficulty": 1.0, "broker_platform_issues": 0.3, "regulatory_confusion": 0.26, "emotional_control": 0.36, "limited_capital": 0.22, "misled_by_rumors": 0.3, "ipo_process_confusing": 0.36, "lacks_mentorship": 0.25}, "broker_platform_issues": {"lacks_knowledge": 0.28, "hard_to_access_info": 0.27, "volatility_difficulty": 0.3, "broker_platform_issues": 1.0, "regulatory_confusion": 0.35, "emotional_control": 0.3, "limited_capital": 0.34, "misled_by_rumors": 0.29, "ipo_process_confusing": 0.24, "lacks_mentorship": 0.27}, "regulatory_confusion": {"lacks_knowledge": 0.25, "hard_to_access_info": 0.38, "volatility_difficulty": 0.26, "broker_platform_issues": 0.35, "regulatory_confusion": 1.0, "emotional_control": 0.35, "limited_capital": 0.26, "misled_by_rumors": 0.21, "ipo_process_confusing": 0.32, "lacks_mentorship": 0.3}, "emotional_control": {"lacks_knowledge": 0.25, "hard_to_access_info": 0.23, "volatility_difficulty": 0.36, "broker_platform_issues": 0.3, "regulatory_confusion": 0.35, "emotional_control": 1.0, "limited_capital": 0.21, "misled_by_rumors": 0.19, "ipo_process_confusing": 0.28, "lacks_mentorship": 0.25}, "limited_capital": {"lacks_knowledge": 0.17, "hard_to_access_info": 0.19, "volatility_difficulty": 0.22, "broker_platform_issues": 0.34, "regulatory_confusion": 0.26, "emotional_control": 0.21, "limited_capital": 1.0, "misled_by_rumors": 0.28, "ipo_process_confusing": 0.33, "lacks_mentorship": 0.24}, "misled_by_rumors": {"lacks_knowledge": 0.28, "hard_to_access_info": 0.24, "volatility_difficulty": 0.3, "broker_platform_issues": 0.29, "regulatory_confusion": 0.21, "emotional_control": 0.19, "limited_capital": 0.28, "misled_by_rumors": 1.0, "ipo_process_confusing": 0.21, "lacks_mentorship": 0.3}, "ipo_process_confusing": {"lacks_knowledge": 0.23, "hard_to_access_info": 0.29, "volatility_difficulty": 0.36, "broker_platform_issues": 0.24, "regulatory_confusion": 0.32, "emotional_control": 0.28, "limited_capital": 0.33, "misled_by_rumors": 0.21, "ipo_process_confusing": 1.0, "lacks_mentorship": 0.29}, "lacks_mentorship": {"lacks_knowledge": 0.25, "hard_to_access_info": 0.22, "volatility_difficulty": 0.25, "broker_platform_issues": 0.27, "regulatory_confusion": 0.3, "emotional_control": 0.25, "limited_capital": 0.24, "misled_by_rumors": 0.3, "ipo_process_confusing": 0.29, "lacks_mentorship": 1.0}}, "regression": {"r_squared": 0.708, "coefficients": {"const": {"coef": 4.4612, "p_value": 0.0}, "experience_ordinal": {"coef": -0.4836, "p_value": 0.0}, "portfolio_ordinal": {"coef": 0.0325, "p_value": 0.1096}, "trade_freq_ordinal": {"coef": 0.0086, "p_value": 0.6567}}}}};
+
+// ---- ticker tape ----
+const tickerEl = document.getElementById('tickerTape');
+let tickerHtml = '';
+DATA.company_metrics.forEach(c => {
+  const cls = c.total_return_pct >= 0 ? 'pos' : 'neg';
+  const sign = c.total_return_pct >= 0 ? '+' : '';
+  tickerHtml += `<span>${c.ticker} <span class="${cls}">${sign}${c.total_return_pct}%</span></span>`;
+});
+tickerEl.innerHTML = tickerHtml + tickerHtml; // duplicate for seamless loop
+
+document.getElementById('badgeCompanies').textContent = `${DATA.company_metrics.length} companies tracked`;
+document.getElementById('badgeRespondents').textContent = `${DATA.survey.n_respondents} survey respondents`;
+document.getElementById('synthNote').textContent = '⚠ ' + DATA.generated_note;
+
+// ---- chart defaults ----
+Chart.defaults.color = '#8fa3b3';
+Chart.defaults.font.family = "'IBM Plex Mono', monospace";
+Chart.defaults.font.size = 11;
+Chart.defaults.borderColor = '#24384a';
+
+// ---- volatility chart ----
+const cmSorted = [...DATA.company_metrics].sort((a,b)=>a.volatility_pct-b.volatility_pct);
+new Chart(document.getElementById('volChart'), {
+  type: 'bar',
+  data: {
+    labels: cmSorted.map(c=>c.ticker),
+    datasets: [{
+      data: cmSorted.map(c=>c.volatility_pct),
+      backgroundColor: '#3b6ea5',
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    plugins: { legend: { display:false } },
+    scales: { x: { title:{display:true, text:'Volatility (%)', color:'#8fa3b3'} } }
+  }
+});
+
+// ---- sector scatter ----
+new Chart(document.getElementById('scatterChart'), {
+  type: 'scatter',
+  data: {
+    datasets: [{
+      data: DATA.sector_metrics.map(s => ({x: s.avg_volatility_pct, y: s.avg_return_pct, label: s.sector})),
+      backgroundColor: '#e0a458',
+      pointRadius: 7,
+    }]
+  },
+  options: {
+    plugins: {
+      legend: { display:false },
+      tooltip: { callbacks: { label: (ctx) => `${ctx.raw.label}: ${ctx.raw.x}% vol, ${ctx.raw.y}% return` } }
+    },
+    scales: {
+      x: { title:{display:true, text:'Avg Volatility (%)', color:'#8fa3b3'} },
+      y: { title:{display:true, text:'Avg 5yr Return (%)', color:'#8fa3b3'} }
+    }
+  }
+});
+
+// ---- company table ----
+const tbody = document.querySelector('#companyTable tbody');
+[...DATA.company_metrics].sort((a,b)=>b.volatility_pct-a.volatility_pct).forEach(c => {
+  const cls = c.total_return_pct >= 0 ? 'pos' : 'neg';
+  const sign = c.total_return_pct >= 0 ? '+' : '';
+  tbody.innerHTML += `<tr>
+    <td>${c.ticker}</td>
+    <td>${c.sector}</td>
+    <td class="num ${cls}">${sign}${c.total_return_pct}%</td>
+    <td class="num">${c.volatility_pct}%</td>
+    <td class="num">${Number(c.avg_daily_volume).toLocaleString()}</td>
+  </tr>`;
+});
+
+// ---- challenge ranking chart ----
+const ranked = [...DATA.survey.ranked_challenges].reverse();
+new Chart(document.getElementById('challengeChart'), {
+  type: 'bar',
+  data: {
+    labels: ranked.map(c=>c.challenge),
+    datasets: [{ data: ranked.map(c=>c.avg_score), backgroundColor:'#4a8c6f' }]
+  },
+  options: {
+    indexAxis: 'y',
+    plugins: { legend: { display:false } },
+    scales: { x: { min:0, max:5, title:{display:true, text:'Avg score (1-5)', color:'#8fa3b3'} } }
+  }
+});
+
+// ---- challenge by experience ----
+new Chart(document.getElementById('experienceChart'), {
+  type: 'bar',
+  data: {
+    labels: DATA.survey.by_experience.map(e=>e.experience),
+    datasets: [{ data: DATA.survey.by_experience.map(e=>e.avg_challenge_score), backgroundColor:'#8a5fbf' }]
+  },
+  options: {
+    plugins: { legend: { display:false } },
+    scales: { y: { min:0, max:5, title:{display:true, text:'Avg score (1-5)', color:'#8fa3b3'} } }
+  }
+});
+
+// ---- statistical analysis section ----
+const stats = DATA.statistical_analysis;
+const strip2 = document.getElementById('statsStrip2');
+const expCorr = stats.experience_vs_challenge_correlation;
+const volCorr = stats.volatility_vs_perceived_difficulty_correlation;
+strip2.innerHTML = `
+  <div class="stat"><div class="num">r = ${expCorr.r}</div><div class="label">experience vs challenge score (p=${expCorr.p_value})</div></div>
+  <div class="stat"><div class="num">r = ${volCorr.r}</div><div class="label">sector volatility vs perceived difficulty (p=${volCorr.p_value})</div></div>
+  <div class="stat"><div class="num">R² = ${stats.regression.r_squared}</div><div class="label">regression model fit</div></div>
+`;
+
+const regBody = document.querySelector('#regressionTable tbody');
+const predictorNames = {
+  const: 'Intercept',
+  experience_ordinal: 'Years investing',
+  portfolio_ordinal: 'Portfolio size',
+  trade_freq_ordinal: 'Trade frequency',
+};
+Object.entries(stats.regression.coefficients).forEach(([key, val]) => {
+  const sig = val.p_value < 0.05 ? '✓ Yes' : '— No';
+  const sigClass = val.p_value < 0.05 ? 'pos' : '';
+  regBody.innerHTML += `<tr>
+    <td>${predictorNames[key] || key}</td>
+    <td class="num">${val.coef}</td>
+    <td class="num">${val.p_value}</td>
+    <td class="${sigClass}">${sig}</td>
+  </tr>`;
+});
+document.getElementById('regressionNote').textContent =
+  `R² = ${stats.regression.r_squared} means these predictors explain about ${(stats.regression.r_squared*100).toFixed(0)}% of the variation in overall challenge score. A predictor is "significant" if p < 0.05, meaning the relationship is unlikely to be due to chance alone.`;
+
+// ---- stat strip ----
+const strip = document.getElementById('statStrip');
+const profitable = DATA.survey.profitability_pct['Yes'] || 0;
+const higherConf = (DATA.survey.confidence_change_pct['Higher']||0) + (DATA.survey.confidence_change_pct['Much higher']||0);
+const topChallenge = DATA.survey.ranked_challenges[0];
+const newInvestorScore = DATA.survey.by_experience[0].avg_challenge_score;
+strip.innerHTML = `
+  <div class="stat"><div class="num">${profitable}%</div><div class="label">report profitable experience</div></div>
+  <div class="stat"><div class="num">${higherConf.toFixed(1)}%</div><div class="label">feel more confident now</div></div>
+  <div class="stat"><div class="num">${topChallenge.avg_score}</div><div class="label">top challenge: ${topChallenge.challenge}</div></div>
+  <div class="stat"><div class="num">${newInvestorScore}</div><div class="label">avg score, investors &lt;1yr</div></div>
+`;
+</script>
+</body>
+</html>

@@ -1,0 +1,389 @@
+{
+  "is_survey_synthetic": true,
+  "generated_note": "Survey data is SYNTHETIC placeholder data for pipeline testing. Replace with real Google Forms responses.",
+  "company_metrics": [
+    {
+      "ticker": "NHPC",
+      "sector": "Hydropower",
+      "start_price": 317.0,
+      "latest_price": 269.0,
+      "total_return_pct": -15.14,
+      "volatility_pct": 3.03,
+      "avg_daily_volume": 210432.0,
+      "n_trading_days": 1161
+    },
+    {
+      "ticker": "UPPER",
+      "sector": "Hydropower",
+      "start_price": 699.0,
+      "latest_price": 199.0,
+      "total_return_pct": -71.53,
+      "volatility_pct": 2.61,
+      "avg_daily_volume": 165770.0,
+      "n_trading_days": 1161
+    },
+    {
+      "ticker": "HIDCL",
+      "sector": "Investment",
+      "start_price": 464.0,
+      "latest_price": 264.8,
+      "total_return_pct": -42.93,
+      "volatility_pct": 2.54,
+      "avg_daily_volume": 190053.0,
+      "n_trading_days": 1161
+    },
+    {
+      "ticker": "ALICL",
+      "sector": "Insurance",
+      "start_price": 1408.0,
+      "latest_price": 433.7,
+      "total_return_pct": -69.2,
+      "volatility_pct": 2.28,
+      "avg_daily_volume": 37179.0,
+      "n_trading_days": 1161
+    },
+    {
+      "ticker": "NLIC",
+      "sector": "Insurance",
+      "start_price": 1967.8,
+      "latest_price": 769.9,
+      "total_return_pct": -60.88,
+      "volatility_pct": 1.89,
+      "avg_daily_volume": 50108.0,
+      "n_trading_days": 1161
+    },
+    {
+      "ticker": "CHCL",
+      "sector": "Hydropower",
+      "start_price": 694.0,
+      "latest_price": 487.0,
+      "total_return_pct": -29.83,
+      "volatility_pct": 1.88,
+      "avg_daily_volume": 52492.0,
+      "n_trading_days": 1161
+    },
+    {
+      "ticker": "NTC",
+      "sector": "Telecom",
+      "start_price": 1318.0,
+      "latest_price": 862.0,
+      "total_return_pct": -34.6,
+      "volatility_pct": 1.86,
+      "avg_daily_volume": 37566.0,
+      "n_trading_days": 1159
+    },
+    {
+      "ticker": "SANIMA",
+      "sector": "Banking",
+      "start_price": 515.0,
+      "latest_price": 361.0,
+      "total_return_pct": -29.9,
+      "volatility_pct": 1.74,
+      "avg_daily_volume": 85392.0,
+      "n_trading_days": 1161
+    },
+    {
+      "ticker": "ADBL",
+      "sector": "Banking",
+      "start_price": 508.0,
+      "latest_price": 311.0,
+      "total_return_pct": -38.78,
+      "volatility_pct": 1.66,
+      "avg_daily_volume": 50114.0,
+      "n_trading_days": 1161
+    },
+    {
+      "ticker": "NABIL",
+      "sector": "Banking",
+      "start_price": 1440.0,
+      "latest_price": 542.7,
+      "total_return_pct": -62.31,
+      "volatility_pct": 1.58,
+      "avg_daily_volume": 71857.0,
+      "n_trading_days": 1161
+    }
+  ],
+  "sector_metrics": [
+    {
+      "sector": "Investment",
+      "avg_return_pct": -42.93,
+      "avg_volatility_pct": 2.54,
+      "n_companies": 1
+    },
+    {
+      "sector": "Hydropower",
+      "avg_return_pct": -38.83,
+      "avg_volatility_pct": 2.51,
+      "n_companies": 3
+    },
+    {
+      "sector": "Insurance",
+      "avg_return_pct": -65.04,
+      "avg_volatility_pct": 2.08,
+      "n_companies": 2
+    },
+    {
+      "sector": "Telecom",
+      "avg_return_pct": -34.6,
+      "avg_volatility_pct": 1.86,
+      "n_companies": 1
+    },
+    {
+      "sector": "Banking",
+      "avg_return_pct": -43.66,
+      "avg_volatility_pct": 1.66,
+      "n_companies": 3
+    }
+  ],
+  "survey": {
+    "n_respondents": 220,
+    "ranked_challenges": [
+      {
+        "challenge": "Lack of financial knowledge",
+        "avg_score": 3.56
+      },
+      {
+        "challenge": "Emotional control (fear/greed)",
+        "avg_score": 3.45
+      },
+      {
+        "challenge": "Limited capital",
+        "avg_score": 3.45
+      },
+      {
+        "challenge": "Hard to access reliable info",
+        "avg_score": 3.42
+      },
+      {
+        "challenge": "Misled by rumors/tips",
+        "avg_score": 3.42
+      },
+      {
+        "challenge": "Market volatility difficulty",
+        "avg_score": 3.4
+      },
+      {
+        "challenge": "Regulatory/tax confusion",
+        "avg_score": 3.4
+      },
+      {
+        "challenge": "IPO/rights process confusion",
+        "avg_score": 3.4
+      },
+      {
+        "challenge": "Lack of mentorship",
+        "avg_score": 3.39
+      },
+      {
+        "challenge": "Broker/TMS platform issues",
+        "avg_score": 3.35
+      }
+    ],
+    "by_experience": [
+      {
+        "experience": "<1 year",
+        "avg_challenge_score": 3.93
+      },
+      {
+        "experience": "1-3 years",
+        "avg_challenge_score": 3.92
+      },
+      {
+        "experience": "3-5 years",
+        "avg_challenge_score": 2.83
+      },
+      {
+        "experience": "5+ years",
+        "avg_challenge_score": 2.68
+      }
+    ],
+    "by_age": [
+      {
+        "segment": "18-24",
+        "avg_challenge_score": 3.39
+      },
+      {
+        "segment": "25-34",
+        "avg_challenge_score": 3.47
+      },
+      {
+        "segment": "35-44",
+        "avg_challenge_score": 3.38
+      },
+      {
+        "segment": "45-54",
+        "avg_challenge_score": 3.53
+      },
+      {
+        "segment": "55+",
+        "avg_challenge_score": 3.39
+      }
+    ],
+    "profitability_pct": {
+      "Yes": 34.5,
+      "No": 33.2,
+      "Break-even": 18.2,
+      "Not sure": 14.1
+    },
+    "confidence_change_pct": {
+      "Higher": 40.0,
+      "Same": 21.8,
+      "Much higher": 17.7,
+      "Lower": 16.4,
+      "Much lower": 4.1
+    }
+  },
+  "statistical_analysis": {
+    "experience_vs_challenge_correlation": {
+      "r": -0.839,
+      "p_value": 0.0
+    },
+    "volatility_vs_perceived_difficulty_correlation": {
+      "r": -0.018,
+      "p_value": 0.8155
+    },
+    "challenge_item_correlation_matrix": {
+      "lacks_knowledge": {
+        "lacks_knowledge": 1.0,
+        "hard_to_access_info": 0.26,
+        "volatility_difficulty": 0.34,
+        "broker_platform_issues": 0.28,
+        "regulatory_confusion": 0.25,
+        "emotional_control": 0.25,
+        "limited_capital": 0.17,
+        "misled_by_rumors": 0.28,
+        "ipo_process_confusing": 0.23,
+        "lacks_mentorship": 0.25
+      },
+      "hard_to_access_info": {
+        "lacks_knowledge": 0.26,
+        "hard_to_access_info": 1.0,
+        "volatility_difficulty": 0.25,
+        "broker_platform_issues": 0.27,
+        "regulatory_confusion": 0.38,
+        "emotional_control": 0.23,
+        "limited_capital": 0.19,
+        "misled_by_rumors": 0.24,
+        "ipo_process_confusing": 0.29,
+        "lacks_mentorship": 0.22
+      },
+      "volatility_difficulty": {
+        "lacks_knowledge": 0.34,
+        "hard_to_access_info": 0.25,
+        "volatility_difficulty": 1.0,
+        "broker_platform_issues": 0.3,
+        "regulatory_confusion": 0.26,
+        "emotional_control": 0.36,
+        "limited_capital": 0.22,
+        "misled_by_rumors": 0.3,
+        "ipo_process_confusing": 0.36,
+        "lacks_mentorship": 0.25
+      },
+      "broker_platform_issues": {
+        "lacks_knowledge": 0.28,
+        "hard_to_access_info": 0.27,
+        "volatility_difficulty": 0.3,
+        "broker_platform_issues": 1.0,
+        "regulatory_confusion": 0.35,
+        "emotional_control": 0.3,
+        "limited_capital": 0.34,
+        "misled_by_rumors": 0.29,
+        "ipo_process_confusing": 0.24,
+        "lacks_mentorship": 0.27
+      },
+      "regulatory_confusion": {
+        "lacks_knowledge": 0.25,
+        "hard_to_access_info": 0.38,
+        "volatility_difficulty": 0.26,
+        "broker_platform_issues": 0.35,
+        "regulatory_confusion": 1.0,
+        "emotional_control": 0.35,
+        "limited_capital": 0.26,
+        "misled_by_rumors": 0.21,
+        "ipo_process_confusing": 0.32,
+        "lacks_mentorship": 0.3
+      },
+      "emotional_control": {
+        "lacks_knowledge": 0.25,
+        "hard_to_access_info": 0.23,
+        "volatility_difficulty": 0.36,
+        "broker_platform_issues": 0.3,
+        "regulatory_confusion": 0.35,
+        "emotional_control": 1.0,
+        "limited_capital": 0.21,
+        "misled_by_rumors": 0.19,
+        "ipo_process_confusing": 0.28,
+        "lacks_mentorship": 0.25
+      },
+      "limited_capital": {
+        "lacks_knowledge": 0.17,
+        "hard_to_access_info": 0.19,
+        "volatility_difficulty": 0.22,
+        "broker_platform_issues": 0.34,
+        "regulatory_confusion": 0.26,
+        "emotional_control": 0.21,
+        "limited_capital": 1.0,
+        "misled_by_rumors": 0.28,
+        "ipo_process_confusing": 0.33,
+        "lacks_mentorship": 0.24
+      },
+      "misled_by_rumors": {
+        "lacks_knowledge": 0.28,
+        "hard_to_access_info": 0.24,
+        "volatility_difficulty": 0.3,
+        "broker_platform_issues": 0.29,
+        "regulatory_confusion": 0.21,
+        "emotional_control": 0.19,
+        "limited_capital": 0.28,
+        "misled_by_rumors": 1.0,
+        "ipo_process_confusing": 0.21,
+        "lacks_mentorship": 0.3
+      },
+      "ipo_process_confusing": {
+        "lacks_knowledge": 0.23,
+        "hard_to_access_info": 0.29,
+        "volatility_difficulty": 0.36,
+        "broker_platform_issues": 0.24,
+        "regulatory_confusion": 0.32,
+        "emotional_control": 0.28,
+        "limited_capital": 0.33,
+        "misled_by_rumors": 0.21,
+        "ipo_process_confusing": 1.0,
+        "lacks_mentorship": 0.29
+      },
+      "lacks_mentorship": {
+        "lacks_knowledge": 0.25,
+        "hard_to_access_info": 0.22,
+        "volatility_difficulty": 0.25,
+        "broker_platform_issues": 0.27,
+        "regulatory_confusion": 0.3,
+        "emotional_control": 0.25,
+        "limited_capital": 0.24,
+        "misled_by_rumors": 0.3,
+        "ipo_process_confusing": 0.29,
+        "lacks_mentorship": 1.0
+      }
+    },
+    "regression": {
+      "r_squared": 0.708,
+      "coefficients": {
+        "const": {
+          "coef": 4.4612,
+          "p_value": 0.0
+        },
+        "experience_ordinal": {
+          "coef": -0.4836,
+          "p_value": 0.0
+        },
+        "portfolio_ordinal": {
+          "coef": 0.0325,
+          "p_value": 0.1096
+        },
+        "trade_freq_ordinal": {
+          "coef": 0.0086,
+          "p_value": 0.6567
+        }
+      }
+    }
+  }
+}
