@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>New Investor Risk Monitor — NEPSE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <div class="ticker-strip">
+    <div class="ticker-track" id="tickerTrack">
+      <span class="ticker-item">Loading NEPSE feed…</span>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <div class="brand">
+      <span class="brand-mark">◆</span>
+      <div class="brand-text">
+        <div class="brand-title">New Investor Risk Monitor</div>
+        <div class="brand-sub">NEPSE market behaviour &amp; investor-reported challenges</div>
+      </div>
+    </div>
+    <nav class="tabs" id="mainTabs">
+      <button class="tab-btn active" data-tab="market">Market Data</button>
+      <button class="tab-btn" data-tab="survey">Survey Insights</button>
+      <button class="tab-btn" data-tab="about">About This Study</button>
+    </nav>
+  </header>
+
+  <main>
+
+    <section id="tab-market" class="tab-panel active">
+
+      <div class="layout">
+        <aside class="controls-panel">
+          <h2 class="panel-title">Controls</h2>
+
+          <label class="field-label" for="tickerSelect">Company</label>
+          <select id="tickerSelect" class="field-input"></select>
+
+          <label class="field-label" for="startDate">Start date</label>
+          <input type="date" id="startDate" class="field-input" value="2021-01-01">
+
+          <label class="field-label" for="endDate">End date</label>
+          <input type="date" id="endDate" class="field-input" value="2026-07-01">
+
+          <button id="loadBtn" class="primary-btn">Update view</button>
+
+          <div class="panel-note">
+            Volatility, drawdown, moving averages and volume-spike detection
+            are computed live from real NEPSE historical price data — the
+            kind of risk signals new investors often can't read.
+          </div>
+        </aside>
+
+        <div class="content-col">
+
+          <div class="summary-cards" id="summaryCards"></div>
+
+          <div class="chart-tabs" id="chartTabs">
+            <button class="chart-tab-btn active" data-chart="volatility">Volatility</button>
+            <button class="chart-tab-btn" data-chart="drawdown">Drawdown</button>
+            <button class="chart-tab-btn" data-chart="trend">Trend (MA)</button>
+            <button class="chart-tab-btn" data-chart="volume">Volume Spikes</button>
+          </div>
+
+          <div class="chart-panel">
+            <p class="chart-caption" id="chartCaption"></p>
+            <canvas id="mainChart" height="110"></canvas>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="section-block">
+        <h2 class="section-title">5-Year Company &amp; Sector Overview</h2>
+        <div class="table-scroll">
+          <table class="data-table" id="companyTable">
+            <thead>
+              <tr>
+                <th>Ticker</th><th>Sector</th><th>Start Price</th><th>Latest Price</th>
+                <th>Total Return</th><th>Volatility</th><th>Avg Daily Volume</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <section id="tab-survey" class="tab-panel">
+
+      <div class="synthetic-banner" id="syntheticBanner" hidden>
+        ⚠ This survey data is <strong>synthetic placeholder data</strong>, generated to test the
+        analysis pipeline. It should be replaced with real respondent data collected under
+        institutional ethics approval before being presented as primary research findings.
+      </div>
+
+      <div class="section-block">
+        <h2 class="section-title">Investor-Reported Challenges (Ranked)</h2>
+        <p class="section-sub" id="respondentCount"></p>
+        <div class="chart-panel">
+          <canvas id="challengeChart" height="100"></canvas>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="section-block">
+          <h2 class="section-title">Challenge Score by Experience</h2>
+          <div class="chart-panel">
+            <canvas id="experienceChart" height="140"></canvas>
+          </div>
+        </div>
+        <div class="section-block">
+          <h2 class="section-title">Reported Profitability</h2>
+          <div class="chart-panel">
+            <canvas id="profitChart" height="140"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-block">
+        <h2 class="section-title">Statistical Findings</h2>
+        <div class="stats-grid" id="statsGrid"></div>
+      </div>
+
+    </section>
+
+    <section id="tab-about" class="tab-panel">
+      <div class="section-block about-block">
+        <h2 class="section-title">About This Study</h2>
+        <p>
+          This dashboard supports a Bachelor's thesis titled
+          <em>"Analysis and Identification of Challenges Faced by New Investors in the
+          Share Market Using Survey-Based and Market Data Analysis."</em>
+        </p>
+        <p>
+          The <strong>market data</strong> side draws on real historical trading data for ten
+          NEPSE-listed companies across banking, hydropower, insurance, telecom and investment
+          sectors, and computes volatility, drawdown, trend, and volume-spike indicators — signals
+          that are difficult for inexperienced investors to interpret in real time.
+        </p>
+        <p>
+          The <strong>survey</strong> side is designed to capture self-reported challenges from
+          new investors directly, covering financial literacy, platform usability, emotional
+          decision-making, regulatory understanding, and access to reliable information.
+        </p>
+        <p>
+          Backend: Flask (Python), serving computed statistics as a JSON API.<br>
+          Frontend: static HTML/CSS/JavaScript, charted with Chart.js.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    Built for academic research purposes. Data pipeline: Flask API + NEPSE historical data.
+  </footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
