@@ -80,6 +80,16 @@ ethics approval (see the "Risk Research Ethics Approval" form for this project).
 
 ---
 
+## Running tests
+
+The backend has unit tests covering the core analysis functions (sector
+mapping, metric computation, aggregation logic):
+
+```bash
+cd backend
+python3 -m pytest tests/ -v
+```
+
 ## Tech stack
 
 - **Backend:** Flask, pandas, numpy, scipy, statsmodels
