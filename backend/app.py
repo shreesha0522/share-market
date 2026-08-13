@@ -287,6 +287,7 @@ def api_market_summary():
 
 @app.route("/api/survey/summary")
 def api_survey_summary():
+    """Return ranked challenges, demographic breakdowns, and profitability stats from the survey."""
     if not os.path.exists(SURVEY_PATH):
         return jsonify({"error": "Survey data not found"}), 404
     result = analyze_survey()
@@ -296,6 +297,7 @@ def api_survey_summary():
 
 @app.route("/api/survey/stats")
 def api_survey_stats():
+    """Return correlation and regression analysis linking investor traits to reported challenges."""
     if not os.path.exists(SURVEY_PATH):
         return jsonify({"error": "Survey data not found"}), 404
     all_data = load_market_data_all()
@@ -307,6 +309,7 @@ def api_survey_stats():
 
 @app.route("/api/health")
 def api_health():
+    """Simple liveness check for the API."""
     return jsonify({"status": "ok"})
 
 
