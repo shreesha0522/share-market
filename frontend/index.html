@@ -20,7 +20,7 @@
 
   <header class="site-header">
     <div class="brand">
-      <span class="brand-mark">◆</span>
+      <span class="brand-mark" aria-hidden="true">◆</span>
       <div class="brand-text">
         <div class="brand-title">New Investor Risk Monitor</div>
         <div class="brand-sub">NEPSE market behaviour &amp; investor-reported challenges</div>
@@ -79,7 +79,7 @@
 
           <div class="chart-panel">
             <p class="chart-caption" id="chartCaption"></p>
-            <canvas id="mainChart" height="110"></canvas>
+            <canvas id="mainChart" height="110" role="img" aria-label="Selected market indicator chart for the chosen company and date range"></canvas>
           </div>
 
         </div>
@@ -119,7 +119,7 @@
         <h2 class="section-title">Investor-Reported Challenges (Ranked)</h2>
         <p class="section-sub" id="respondentCount"></p>
         <div class="chart-panel">
-          <canvas id="challengeChart" height="100"></canvas>
+          <canvas id="challengeChart" height="100" role="img" aria-label="Bar chart ranking investor-reported challenges by average score"></canvas>
         </div>
       </div>
 
@@ -127,13 +127,13 @@
         <div class="section-block">
           <h2 class="section-title">Challenge Score by Experience</h2>
           <div class="chart-panel">
-            <canvas id="experienceChart" height="140"></canvas>
+            <canvas id="experienceChart" height="140" role="img" aria-label="Bar chart showing average challenge score by years of investing experience"></canvas>
           </div>
         </div>
         <div class="section-block">
           <h2 class="section-title">Reported Profitability</h2>
           <div class="chart-panel">
-            <canvas id="profitChart" height="140"></canvas>
+            <canvas id="profitChart" height="140" role="img" aria-label="Doughnut chart showing reported profitability outcomes among survey respondents"></canvas>
           </div>
         </div>
       </div>
