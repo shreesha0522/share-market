@@ -236,6 +236,14 @@ def api_market_ticker(ticker):
 
     start = request.args.get("start")
     end = request.args.get("end")
+
+    for label, value in (("start", start), ("end", end)):
+        if value:
+            try:
+                pd.to_datetime(value)
+            except (ValueError, TypeError):
+                return jsonify({"error": f"Invalid '{label}' date format. Use YYYY-MM-DD."}), 400
+
     df = load_ticker(ticker, start, end)
 
     if df is None:
