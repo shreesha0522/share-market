@@ -1,0 +1,10 @@
+# Normalize line endings across platforms
+* text=auto eol=lf
+
+# Treat these as binary (don't diff/merge as text)
+*.csv binary
+*.png binary
+*.ico binary
+
+# Don't show generated outputs in language stats
+outputs/* linguist-generated=true
