@@ -60,7 +60,14 @@
 
         <div class="content-col">
 
-          <div class="summary-cards" id="summaryCards"></div>
+          <div class="status-banner error-banner" id="marketError" hidden></div>
+          <div class="loading-indicator" id="marketLoading" hidden>
+            <span class="spinner"></span> Loading market data…
+          </div>
+
+          <div class="summary-cards" id="summaryCards">
+            <!-- populated by JS -->
+          </div>
 
           <div class="chart-tabs" id="chartTabs">
             <button class="chart-tab-btn active" data-chart="volatility">Volatility</button>
@@ -102,6 +109,11 @@
         institutional ethics approval before being presented as primary research findings.
       </div>
 
+      <div class="status-banner error-banner" id="surveyError" hidden></div>
+      <div class="loading-indicator" id="surveyLoading" hidden>
+        <span class="spinner"></span> Loading survey data…
+      </div>
+
       <div class="section-block">
         <h2 class="section-title">Investor-Reported Challenges (Ranked)</h2>
         <p class="section-sub" id="respondentCount"></p>
@@ -127,7 +139,9 @@
 
       <div class="section-block">
         <h2 class="section-title">Statistical Findings</h2>
-        <div class="stats-grid" id="statsGrid"></div>
+        <div class="stats-grid" id="statsGrid">
+          <!-- populated by JS -->
+        </div>
       </div>
 
     </section>

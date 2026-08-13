@@ -1,7 +1,3 @@
-window.addEventListener('unhandledrejection', function(e) {
-  console.error('REJECTION REASON:', e.reason);
-  console.error('STACK:', e.reason && e.reason.stack);
-});
 const API_BASE = "http://127.0.0.1:5000/api";
 
 const CHART_COLORS = {
@@ -51,18 +47,49 @@ async function init() {
 }
 
 async function loadTickerList() {
-  const res = await fetch(`${API_BASE}/tickers`);
-  const tickers = await res.json();
-
-  const select = document.getElementById("tickerSelect");
-  select.innerHTML = tickers
-    .map((t) => `<option value="${t.ticker}">${t.ticker} — ${t.sector}</option>`)
-    .join("");
-  select.value = "NABIL";
-
   const track = document.getElementById("tickerTrack");
-  const items = tickers.map((t) => `<span class="ticker-item">${t.ticker} · ${t.sector}</span>`);
-  track.innerHTML = items.concat(items).join("");
+  const select = document.getElementById("tickerSelect");
+
+  try {
+    const res = await fetch(`${API_BASE}/tickers`);
+    if (!res.ok) throw new Error("Couldn't load ticker list.");
+    const tickers = await res.json();
+
+    select.innerHTML = tickers
+      .map((t) => `<option value="${t.ticker}">${t.ticker} — ${t.sector}</option>`)
+      .join("");
+    select.value = "NABIL";
+
+    const items = tickers.map((t) => `<span class="ticker-item">${t.ticker} · ${t.sector}</span>`);
+    track.innerHTML = items.concat(items).join("");
+  } catch (err) {
+    track.innerHTML = `<span class="ticker-item">${friendlyFetchError(err)}</span>`;
+    select.innerHTML = `<option value="">No companies available</option>`;
+    showError("marketError", friendlyFetchError(err));
+    showLoading("marketLoading", false);
+  }
+}
+
+function showLoading(id, isLoading) {
+  document.getElementById(id).hidden = !isLoading;
+}
+
+function showError(id, message) {
+  const el = document.getElementById(id);
+  if (!message) {
+    el.hidden = true;
+    el.textContent = "";
+    return;
+  }
+  el.hidden = false;
+  el.textContent = message;
+}
+
+function friendlyFetchError(err) {
+  if (err instanceof TypeError) {
+    return "Couldn't reach the server. Make sure the Flask backend is running on http://127.0.0.1:5000.";
+  }
+  return err.message || "Something went wrong loading this data.";
 }
 
 async function loadTickerView() {
@@ -70,17 +97,32 @@ async function loadTickerView() {
   const start = document.getElementById("startDate").value;
   const end = document.getElementById("endDate").value;
 
-  const res = await fetch(`${API_BASE}/market/${ticker}?start=${start}&end=${end}`);
-  if (!res.ok) {
-    document.getElementById("summaryCards").innerHTML =
-      `<div class="summary-card"><div class="card-label">Error</div><div class="card-value neg">No data</div></div>`;
-    return;
-  }
-  const data = await res.json();
-  currentTickerData = data;
+  showError("marketError", null);
+  showLoading("marketLoading", true);
+  document.getElementById("summaryCards").innerHTML = "";
 
-  renderSummaryCards(data.summary);
-  renderMainChart(data);
+  try {
+    const res = await fetch(`${API_BASE}/market/${ticker}?start=${start}&end=${end}`);
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      const msg = body.error || `No data available for ${ticker} in that date range.`;
+      showError("marketError", msg);
+      currentTickerData = null;
+      if (mainChart) { mainChart.destroy(); mainChart = null; }
+      return;
+    }
+
+    const data = await res.json();
+    currentTickerData = data;
+    renderSummaryCards(data.summary);
+    renderMainChart(data);
+  } catch (err) {
+    showError("marketError", friendlyFetchError(err));
+    currentTickerData = null;
+  } finally {
+    showLoading("marketLoading", false);
+  }
 }
 
 function renderSummaryCards(summary) {
@@ -164,29 +206,49 @@ function renderMainChart(data) {
 }
 
 async function loadMarketSummaryTable() {
-  const res = await fetch(`${API_BASE}/market/summary`);
-  const data = await res.json();
   const tbody = document.querySelector("#companyTable tbody");
-  tbody.innerHTML = data.company_metrics
-    .map((r) => {
-      const retClass = r.total_return_pct >= 0 ? "pos" : "neg";
-      return `<tr>
-        <td>${r.ticker}</td>
-        <td>${r.sector}</td>
-        <td>Rs. ${r.start_price}</td>
-        <td>Rs. ${r.latest_price}</td>
-        <td class="${retClass}">${r.total_return_pct}%</td>
-        <td>${r.volatility_pct}%</td>
-        <td>${Number(r.avg_daily_volume).toLocaleString()}</td>
-      </tr>`;
-    })
-    .join("");
+  try {
+    const res = await fetch(`${API_BASE}/market/summary`);
+    if (!res.ok) throw new Error("Couldn't load the company overview table.");
+    const data = await res.json();
+    tbody.innerHTML = data.company_metrics
+      .map((r) => {
+        const retClass = r.total_return_pct >= 0 ? "pos" : "neg";
+        return `<tr>
+          <td>${r.ticker}</td>
+          <td>${r.sector}</td>
+          <td>Rs. ${r.start_price}</td>
+          <td>Rs. ${r.latest_price}</td>
+          <td class="${retClass}">${r.total_return_pct}%</td>
+          <td>${r.volatility_pct}%</td>
+          <td>${Number(r.avg_daily_volume).toLocaleString()}</td>
+        </tr>`;
+      })
+      .join("");
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="7" style="color: var(--text-muted);">${friendlyFetchError(err)}</td></tr>`;
+  }
 }
 
 async function loadSurveySummary() {
-  const res = await fetch(`${API_BASE}/survey/summary`);
-  if (!res.ok) return;
-  const data = await res.json();
+  showError("surveyError", null);
+  showLoading("surveyLoading", true);
+
+  let data;
+  try {
+    const res = await fetch(`${API_BASE}/survey/summary`);
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      showError("surveyError", body.error || "Survey data isn't available right now.");
+      return;
+    }
+    data = await res.json();
+  } catch (err) {
+    showError("surveyError", friendlyFetchError(err));
+    return;
+  } finally {
+    showLoading("surveyLoading", false);
+  }
 
   document.getElementById("syntheticBanner").hidden = !data.is_synthetic;
   document.getElementById("respondentCount").textContent = `Based on ${data.n_respondents} respondents`;
@@ -235,9 +297,14 @@ async function loadSurveySummary() {
 }
 
 async function loadSurveyStats() {
-  const res = await fetch(`${API_BASE}/survey/stats`);
-  if (!res.ok) return;
-  const data = await res.json();
+  let data;
+  try {
+    const res = await fetch(`${API_BASE}/survey/stats`);
+    if (!res.ok) return;
+    data = await res.json();
+  } catch (err) {
+    return;
+  }
 
   const expCorr = data.experience_vs_challenge_correlation;
   const volCorr = data.volatility_vs_perceived_difficulty_correlation;
