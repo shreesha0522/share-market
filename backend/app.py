@@ -262,6 +262,9 @@ def api_market_ticker(ticker):
         "volume_spike": df["Volume_Spike"].fillna(False).tolist(),
     }
 
+    returns = df["Daily Return"].dropna()
+    var_95 = None if returns.empty else round(float(returns.quantile(0.05)), 4)
+
     summary = {
         "ticker": ticker,
         "sector": SECTOR_MAP[ticker],
@@ -269,6 +272,7 @@ def api_market_ticker(ticker):
         "max_drawdown": None if df["Drawdown"].dropna().empty else round(float(df["Drawdown"].min()), 4),
         "volume_spike_days": int(df["Volume_Spike"].sum()),
         "latest_close": round(float(df["Close"].iloc[-1]), 2),
+        "var_95": var_95,
     }
 
     return jsonify({"summary": summary, "series": series})
@@ -282,6 +286,35 @@ def api_market_summary():
     return jsonify({
         "company_metrics": company_metrics.to_dict(orient="records"),
         "sector_metrics": sector_metrics.to_dict(orient="records"),
+    })
+
+
+@app.route("/api/market/correlation")
+def api_market_correlation():
+    """
+    Correlation matrix of daily returns across all companies.
+    Shows whether holding multiple stocks actually diversifies risk —
+    highly correlated stocks move together and offer little real diversification.
+    """
+    frames = {}
+    for ticker in SECTOR_MAP:
+        path = os.path.join(MARKET_DIR, f"{ticker}.csv")
+        if not os.path.exists(path):
+            continue
+        df = pd.read_csv(path)
+        df["published_date"] = pd.to_datetime(df["published_date"], errors="coerce")
+        df = df.dropna(subset=["published_date", "close"]).sort_values("published_date")
+        df = df.set_index("published_date")
+        df = df[~df.index.duplicated(keep="first")]  # some NEPSE CSVs have duplicate dates
+        frames[ticker] = df["close"].pct_change()
+
+    combined = pd.DataFrame(frames)
+    corr = combined.corr().round(2)
+    corr = corr.where(pd.notna(corr), None)
+
+    return jsonify({
+        "tickers": list(corr.columns),
+        "matrix": corr.to_dict(),
     })
 
 
