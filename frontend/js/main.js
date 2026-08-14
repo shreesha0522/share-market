@@ -156,12 +156,31 @@ async function loadTickerView() {
     currentTickerData = data;
     renderSummaryCards(data.summary);
     renderMainChart(data);
+    renderExtremeDays(data.extreme_days);
   } catch (err) {
     showError("marketError", friendlyFetchError(err));
     currentTickerData = null;
   } finally {
     showLoading("marketLoading", false);
   }
+}
+
+function renderExtremeDays(extremeDays) {
+  const bestBody = document.querySelector("#bestDaysTable tbody");
+  const worstBody = document.querySelector("#worstDaysTable tbody");
+
+  if (!extremeDays) {
+    bestBody.innerHTML = worstBody.innerHTML = "";
+    return;
+  }
+
+  bestBody.innerHTML = extremeDays.best
+    .map((d) => `<tr><td>${d.date}</td><td class="pos">+${d.return_pct}%</td><td>Rs. ${d.close}</td></tr>`)
+    .join("");
+
+  worstBody.innerHTML = extremeDays.worst
+    .map((d) => `<tr><td>${d.date}</td><td class="neg">${d.return_pct}%</td><td>Rs. ${d.close}</td></tr>`)
+    .join("");
 }
 
 function renderSummaryCards(summary) {
