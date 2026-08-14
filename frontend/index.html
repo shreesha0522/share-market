@@ -125,6 +125,20 @@
       </div>
 
       <div class="section-block">
+        <h2 class="section-title">Compare Companies (Normalized)</h2>
+        <p class="section-sub">
+          Raw prices can't be compared directly across companies with very different share prices.
+          This rebases each selected company to 100 at the start of the date range, so you can see
+          which one actually performed better or worse — not just which has a bigger number.
+        </p>
+        <div class="compare-controls" id="compareControls"></div>
+        <button id="compareBtn" class="primary-btn" style="width: auto; margin-top: 0.75rem;">Compare selected</button>
+        <div class="chart-panel" style="margin-top: 1rem;">
+          <canvas id="compareChart" height="110"></canvas>
+        </div>
+      </div>
+
+      <div class="section-block">
         <h2 class="section-title">Cross-Company Correlation</h2>
         <p class="section-sub">
           How closely each company's daily returns move together. Values near 1.0 mean holding

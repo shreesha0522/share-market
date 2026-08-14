@@ -45,6 +45,75 @@ async function init() {
   await loadSurveyStats();
 
   document.getElementById("loadBtn").addEventListener("click", loadTickerView);
+  document.getElementById("compareBtn").addEventListener("click", loadComparisonChart);
+}
+
+let compareChart = null;
+
+async function loadComparisonChart() {
+  const checked = Array.from(document.querySelectorAll("#compareControls input:checked")).map((cb) => cb.value);
+
+  if (checked.length === 0) {
+    return;
+  }
+  if (checked.length > 5) {
+    alert("Please select 5 companies or fewer for a readable comparison.");
+    return;
+  }
+
+  const start = document.getElementById("startDate").value;
+  const end = document.getElementById("endDate").value;
+
+  const palette = [CHART_COLORS.accent, CHART_COLORS.purple, CHART_COLORS.green, CHART_COLORS.red, "#5DADE2"];
+
+  const results = await Promise.all(
+    checked.map((ticker) =>
+      fetch(`${API_BASE}/market/${ticker}?start=${start}&end=${end}`)
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null)
+    )
+  );
+
+  const datasets = [];
+  let labels = [];
+
+  results.forEach((data, i) => {
+    if (!data || !data.series || data.series.close.length === 0) return;
+    const closes = data.series.close;
+    const base = closes[0];
+    const normalized = closes.map((c) => Math.round((c / base) * 10000) / 100);
+
+    if (normalized.length > labels.length) labels = data.series.dates;
+
+    datasets.push({
+      label: checked[i],
+      data: normalized,
+      borderColor: palette[i % palette.length],
+      borderWidth: 1.8,
+      pointRadius: 0,
+      tension: 0.1,
+    });
+  });
+
+  const ctx = document.getElementById("compareChart").getContext("2d");
+  if (compareChart) compareChart.destroy();
+
+  compareChart = new Chart(ctx, {
+    type: "line",
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      interaction: { mode: "index", intersect: false },
+      scales: {
+        x: { ticks: { maxTicksLimit: 8, font: { size: 10 } }, grid: { color: CHART_COLORS.grid } },
+        y: {
+          title: { display: true, text: "Value (start = 100)", color: CHART_COLORS.muted },
+          grid: { color: CHART_COLORS.grid },
+        },
+      },
+      plugins: { legend: { labels: { boxWidth: 12, font: { size: 11 } } } },
+    },
+  });
 }
 
 function correlationColor(value) {
@@ -85,6 +154,26 @@ async function loadCorrelationTable() {
   }
 }
 
+async function populateCompareControls(tickers) {
+  const container = document.getElementById("compareControls");
+  const defaults = new Set(["NABIL", "NHPC", "NLIC"]);
+
+  container.innerHTML = tickers
+    .map((t) => `
+      <label class="compare-pill ${defaults.has(t.ticker) ? "checked" : ""}">
+        <input type="checkbox" value="${t.ticker}" ${defaults.has(t.ticker) ? "checked" : ""}>
+        ${t.ticker}
+      </label>
+    `)
+    .join("");
+
+  container.querySelectorAll(".compare-pill input").forEach((cb) => {
+    cb.addEventListener("change", () => {
+      cb.closest(".compare-pill").classList.toggle("checked", cb.checked);
+    });
+  });
+}
+
 async function loadTickerList() {
   const track = document.getElementById("tickerTrack");
   const select = document.getElementById("tickerSelect");
@@ -101,6 +190,7 @@ async function loadTickerList() {
 
     const items = tickers.map((t) => `<span class="ticker-item">${t.ticker} · ${t.sector}</span>`);
     track.innerHTML = items.concat(items).join("");
+    populateCompareControls(tickers);
   } catch (err) {
     track.innerHTML = `<span class="ticker-item">${friendlyFetchError(err)}</span>`;
     select.innerHTML = `<option value="">No companies available</option>`;
