@@ -1,5 +1,5 @@
 """
-Basic tests for the Flask backend's core computation logic.
+Basic tests for the backend's core computation logic.
 Run with: pytest tests/
 """
 
@@ -12,7 +12,7 @@ import pytest
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import app as backend
+from analysis import market, survey
 
 
 @pytest.fixture
@@ -30,33 +30,34 @@ def sample_price_df():
 
 def test_sector_map_has_all_tickers():
     """Every ticker should map to exactly one sector."""
-    assert len(backend.SECTOR_MAP) == 10
-    assert all(isinstance(v, str) for v in backend.SECTOR_MAP.values())
+    assert len(market.SECTOR_MAP) == 10
+    assert all(isinstance(v, str) for v in market.SECTOR_MAP.values())
 
 
 def test_challenge_labels_match_columns():
     """Every challenge column should have a corresponding human-readable label."""
-    assert set(backend.CHALLENGE_COLS) == set(backend.CHALLENGE_LABELS.keys())
+    assert set(survey.CHALLENGE_COLS) == set(survey.CHALLENGE_LABELS.keys())
 
 
 def test_experience_order_is_monotonic():
     """Experience levels should be ordered from least to most experienced."""
-    values = list(backend.EXPERIENCE_ORDER.values())
+    values = list(survey.EXPERIENCE_ORDER.values())
     assert values == sorted(values)
 
 
-def test_compute_company_metrics_shape(sample_price_df, tmp_path, monkeypatch):
+def test_compute_company_metrics_shape(sample_price_df):
     """compute_company_metrics should return one row per ticker with expected columns."""
     sample_price_df["ticker"] = "NABIL"
     sample_price_df["sector"] = "Banking"
     sample_price_df["daily_return_pct"] = sample_price_df["close"].pct_change() * 100
 
-    result = backend.compute_company_metrics(sample_price_df, recent_years=5)
+    result = market.compute_company_metrics(sample_price_df, recent_years=5)
 
     assert len(result) == 1
     expected_cols = {
         "ticker", "sector", "start_price", "latest_price",
-        "total_return_pct", "volatility_pct", "avg_daily_volume", "n_trading_days",
+        "total_return_pct", "volatility_pct", "avg_daily_volume",
+        "n_trading_days", "risk_adjusted_return",
     }
     assert expected_cols.issubset(set(result.columns))
 
@@ -67,9 +68,24 @@ def test_compute_sector_metrics_aggregates_correctly():
         {"ticker": "A", "sector": "Banking", "total_return_pct": 10.0, "volatility_pct": 2.0},
         {"ticker": "B", "sector": "Banking", "total_return_pct": 20.0, "volatility_pct": 4.0},
     ])
-    result = backend.compute_sector_metrics(company_metrics)
+    result = market.compute_sector_metrics(company_metrics)
     banking_row = result[result["sector"] == "Banking"].iloc[0]
 
     assert banking_row["avg_return_pct"] == 15.0
     assert banking_row["avg_volatility_pct"] == 3.0
     assert banking_row["n_companies"] == 2
+    assert banking_row["risk_adjusted_return"] == 5.0  # 15.0 / 3.0
+
+
+def test_compute_extreme_days_returns_five_each(sample_price_df):
+    """compute_extreme_days should return exactly 5 best and 5 worst days."""
+    sample_price_df["published_date"] = pd.to_datetime(sample_price_df["published_date"])
+    sample_price_df = sample_price_df.set_index("published_date")
+    sample_price_df = sample_price_df.rename(columns={"close": "Close"})
+    sample_price_df["Daily Return"] = sample_price_df["Close"].pct_change()
+
+    result = market.compute_extreme_days(sample_price_df)
+
+    assert len(result["best"]) == 5
+    assert len(result["worst"]) == 5
+    assert result["best"][0]["return_pct"] >= result["best"][-1]["return_pct"]
