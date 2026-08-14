@@ -40,10 +40,49 @@ async function init() {
   await loadTickerList();
   await loadTickerView();
   await loadMarketSummaryTable();
+  await loadCorrelationTable();
   await loadSurveySummary();
   await loadSurveyStats();
 
   document.getElementById("loadBtn").addEventListener("click", loadTickerView);
+}
+
+function correlationColor(value) {
+  // Strong positive: warm accent tint. Weak/negative: neutral.
+  if (value === null) return "transparent";
+  const intensity = Math.min(Math.abs(value), 1);
+  if (value >= 0) {
+    return `rgba(212, 162, 78, ${0.12 + intensity * 0.55})`;
+  }
+  return `rgba(196, 85, 77, ${0.12 + intensity * 0.55})`;
+}
+
+async function loadCorrelationTable() {
+  const table = document.getElementById("correlationTable");
+  try {
+    const res = await fetch(`${API_BASE}/market/correlation`);
+    if (!res.ok) throw new Error("Couldn't load correlation data.");
+    const data = await res.json();
+    const tickers = data.tickers;
+
+    let html = "<thead><tr><th></th>";
+    tickers.forEach((t) => (html += `<th>${t}</th>`));
+    html += "</tr></thead><tbody>";
+
+    tickers.forEach((rowTicker) => {
+      html += `<tr><th>${rowTicker}</th>`;
+      tickers.forEach((colTicker) => {
+        const value = data.matrix[rowTicker] ? data.matrix[rowTicker][colTicker] : null;
+        const display = value === null ? "—" : value.toFixed(2);
+        html += `<td style="background:${correlationColor(value)}; text-align:center;">${display}</td>`;
+      });
+      html += "</tr>";
+    });
+    html += "</tbody>";
+    table.innerHTML = html;
+  } catch (err) {
+    table.innerHTML = `<tr><td style="color: var(--text-muted);">${friendlyFetchError(err)}</td></tr>`;
+  }
 }
 
 async function loadTickerList() {
@@ -147,6 +186,10 @@ function renderSummaryCards(summary) {
     <div class="summary-card">
       <div class="card-label">Volume Spike Days</div>
       <div class="card-value">${summary.volume_spike_days}</div>
+    </div>
+    <div class="summary-card">
+      <div class="card-label">Value at Risk (95%)</div>
+      <div class="card-value neg">${summary.var_95 !== null ? (summary.var_95 * 100).toFixed(1) + "%" : "—"}</div>
     </div>
   `;
 }
