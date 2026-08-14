@@ -265,6 +265,25 @@ def api_market_ticker(ticker):
     returns = df["Daily Return"].dropna()
     var_95 = None if returns.empty else round(float(returns.quantile(0.05)), 4)
 
+    returns_with_dates = df["Daily Return"].dropna()
+    best_days = returns_with_dates.nlargest(5)
+    worst_days = returns_with_dates.nsmallest(5)
+
+    def to_day_list(series):
+        return [
+            {
+                "date": idx.strftime("%Y-%m-%d"),
+                "return_pct": round(float(val) * 100, 2),
+                "close": round(float(df.loc[idx, "Close"]), 2),
+            }
+            for idx, val in series.items()
+        ]
+
+    extreme_days = {
+        "best": to_day_list(best_days),
+        "worst": to_day_list(worst_days),
+    }
+
     summary = {
         "ticker": ticker,
         "sector": SECTOR_MAP[ticker],
@@ -275,7 +294,7 @@ def api_market_ticker(ticker):
         "var_95": var_95,
     }
 
-    return jsonify({"summary": summary, "series": series})
+    return jsonify({"summary": summary, "series": series, "extreme_days": extreme_days})
 
 
 @app.route("/api/market/summary")
