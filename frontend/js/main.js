@@ -276,6 +276,7 @@ async function loadMarketSummaryTable() {
     tbody.innerHTML = data.company_metrics
       .map((r) => {
         const retClass = r.total_return_pct >= 0 ? "pos" : "neg";
+        const raClass = (r.risk_adjusted_return ?? 0) >= 0 ? "pos" : "neg";
         return `<tr>
           <td>${r.ticker}</td>
           <td>${r.sector}</td>
@@ -283,6 +284,7 @@ async function loadMarketSummaryTable() {
           <td>Rs. ${r.latest_price}</td>
           <td class="${retClass}">${r.total_return_pct}%</td>
           <td>${r.volatility_pct}%</td>
+          <td class="${raClass}">${r.risk_adjusted_return ?? "—"}</td>
           <td>${Number(r.avg_daily_volume).toLocaleString()}</td>
         </tr>`;
       })

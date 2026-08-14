@@ -109,6 +109,8 @@ def compute_company_metrics(all_data, recent_years=5):
         total_return = (group["close"].iloc[-1] / group["close"].iloc[0] - 1) * 100
         volatility = group["daily_return_pct"].std()
         avg_daily_volume = group["traded_quantity"].mean()
+        risk_adjusted_return = None if volatility == 0 or pd.isna(volatility) else round(float(total_return / volatility), 2)
+
         metrics.append({
             "ticker": ticker,
             "sector": SECTOR_MAP[ticker],
@@ -118,12 +120,13 @@ def compute_company_metrics(all_data, recent_years=5):
             "volatility_pct": round(float(volatility), 2),
             "avg_daily_volume": round(float(avg_daily_volume), 0),
             "n_trading_days": int(len(group)),
+            "risk_adjusted_return": risk_adjusted_return,
         })
     return pd.DataFrame(metrics).sort_values("volatility_pct", ascending=False)
 
 
 def compute_sector_metrics(company_metrics):
-    return (
+    result = (
         company_metrics.groupby("sector")
         .agg(
             avg_return_pct=("total_return_pct", "mean"),
@@ -134,6 +137,10 @@ def compute_sector_metrics(company_metrics):
         .reset_index()
         .sort_values("avg_volatility_pct", ascending=False)
     )
+    # Risk-adjusted return: average return per unit of average volatility.
+    # Higher = better reward for the risk taken, not just higher raw return.
+    result["risk_adjusted_return"] = (result["avg_return_pct"] / result["avg_volatility_pct"]).round(2)
+    return result
 
 
 def analyze_survey():
