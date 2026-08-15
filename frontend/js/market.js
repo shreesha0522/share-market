@@ -351,8 +351,14 @@ export async function loadKeyFindings() {
     if (byRiskAdj.length) {
       const best = byRiskAdj[0];
       const worst = byRiskAdj[byRiskAdj.length - 1];
-      findings.push(`<strong>${best.ticker}</strong> (${best.sector}) had the best risk-adjusted return (${best.risk_adjusted_return}) — the most reward per unit of volatility over the period.`);
-      findings.push(`<strong>${worst.ticker}</strong> (${worst.sector}) had the worst risk-adjusted return (${worst.risk_adjusted_return}) — high risk without compensating reward.`);
+      const bestPhrase = best.risk_adjusted_return >= 0
+        ? `the most reward per unit of volatility over the period`
+        : `the smallest loss per unit of volatility — still negative, but the least damaging`;
+      const worstPhrase = worst.risk_adjusted_return >= 0
+        ? `the least reward per unit of volatility taken`
+        : `the largest loss per unit of volatility — high risk with the worst outcome`;
+      findings.push(`<strong>${best.ticker}</strong> (${best.sector}) had the best risk-adjusted return (${best.risk_adjusted_return}) — ${bestPhrase}.`);
+      findings.push(`<strong>${worst.ticker}</strong> (${worst.sector}) had the worst risk-adjusted return (${worst.risk_adjusted_return}) — ${worstPhrase}.`);
     }
 
     const negCount = summary.company_metrics.filter((c) => c.total_return_pct < 0).length;
