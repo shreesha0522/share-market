@@ -89,3 +89,28 @@ def test_compute_extreme_days_returns_five_each(sample_price_df):
     assert len(result["best"]) == 5
     assert len(result["worst"]) == 5
     assert result["best"][0]["return_pct"] >= result["best"][-1]["return_pct"]
+
+
+def test_compute_value_at_risk_known_distribution():
+    """VaR at 95% should equal the 5th percentile of a known set of returns."""
+    df = pd.DataFrame({"Daily Return": [-0.10, -0.05, -0.02, 0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06]})
+    result = market.compute_value_at_risk(df)
+    expected = df["Daily Return"].quantile(0.05)
+    assert result == round(float(expected), 4)
+
+
+def test_compute_value_at_risk_empty_returns_none():
+    """VaR should return None rather than error when there's no return data."""
+    df = pd.DataFrame({"Daily Return": [None, None]})
+    result = market.compute_value_at_risk(df)
+    assert result is None
+
+
+def test_compute_sector_metrics_handles_zero_volatility():
+    """Risk-adjusted return should be None (not a crash) when volatility is zero."""
+    company_metrics = pd.DataFrame([
+        {"ticker": "A", "sector": "Flat", "total_return_pct": 5.0, "volatility_pct": 0.0},
+    ])
+    result = market.compute_sector_metrics(company_metrics)
+    flat_row = result[result["sector"] == "Flat"].iloc[0]
+    assert pd.isna(flat_row["risk_adjusted_return"]) or flat_row["risk_adjusted_return"] is None

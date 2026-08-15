@@ -109,7 +109,12 @@ def compute_sector_metrics(company_metrics: pd.DataFrame) -> pd.DataFrame:
     )
     # Risk-adjusted return: average return per unit of average volatility.
     # Higher = better reward for the risk taken, not just higher raw return.
-    result["risk_adjusted_return"] = (result["avg_return_pct"] / result["avg_volatility_pct"]).round(2)
+    # Guard against division by zero (a sector with zero average volatility) to avoid inf/-inf.
+    result["risk_adjusted_return"] = result.apply(
+        lambda row: round(row["avg_return_pct"] / row["avg_volatility_pct"], 2)
+        if row["avg_volatility_pct"] != 0 else None,
+        axis=1,
+    )
     return result
 
 
