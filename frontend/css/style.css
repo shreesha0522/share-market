@@ -578,3 +578,16 @@ main { padding: 1.75rem 2rem 3rem; max-width: 1280px; margin: 0 auto; }
   .card-value.neg, .card-value.accent { color: #a3392f !important; }
   canvas { max-width: 100% !important; }
 }
+
+/* ===========================================================
+   Key Findings (Market tab)
+   =========================================================== */
+.findings-list {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--text);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+.findings-list li { margin-bottom: 0.6rem; }
+.findings-list strong { color: var(--accent); }

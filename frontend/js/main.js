@@ -1,5 +1,5 @@
 import { CHART_COLORS } from "./utils.js";
-import { loadTickerList, loadTickerView, loadMarketSummaryTable, loadCorrelationTable, loadComparisonChart, setupChartTabs } from "./market.js";
+import { loadTickerList, loadTickerView, loadMarketSummaryTable, loadCorrelationTable, loadComparisonChart, loadKeyFindings, setupChartTabs } from "./market.js";
 import { loadSurveySummary, loadSectorLinkage, loadSurveyStats } from "./survey.js";
 
 Chart.defaults.color = CHART_COLORS.muted;
@@ -27,6 +27,7 @@ async function init() {
   await loadTickerView();
   await loadMarketSummaryTable();
   await loadCorrelationTable();
+  await loadKeyFindings();
   await loadSurveySummary();
   await loadSurveyStats();
   await loadSectorLinkage();

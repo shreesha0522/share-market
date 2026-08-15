@@ -326,3 +326,54 @@ export async function loadComparisonChart() {
     },
   });
 }
+
+export async function loadKeyFindings() {
+  const listEl = document.getElementById("keyFindingsList");
+  if (!listEl) return;
+
+  try {
+    const [summaryRes, corrRes] = await Promise.all([
+      fetch(`${API_BASE}/market/summary`),
+      fetch(`${API_BASE}/market/correlation`),
+    ]);
+    if (!summaryRes.ok || !corrRes.ok) throw new Error("Couldn't load key findings.");
+    const summary = await summaryRes.json();
+    const corr = await corrRes.json();
+
+    const findings = [];
+
+    const sectorsByVol = [...summary.sector_metrics].sort((a, b) => b.avg_volatility_pct - a.avg_volatility_pct);
+    const mostVol = sectorsByVol[0];
+    const leastVol = sectorsByVol[sectorsByVol.length - 1];
+    findings.push(`<strong>${mostVol.sector}</strong> is the most volatile sector (avg ${mostVol.avg_volatility_pct}% daily volatility), while <strong>${leastVol.sector}</strong> is the least volatile (${leastVol.avg_volatility_pct}%).`);
+
+    const byRiskAdj = summary.company_metrics.filter((c) => c.risk_adjusted_return !== null).sort((a, b) => b.risk_adjusted_return - a.risk_adjusted_return);
+    if (byRiskAdj.length) {
+      const best = byRiskAdj[0];
+      const worst = byRiskAdj[byRiskAdj.length - 1];
+      findings.push(`<strong>${best.ticker}</strong> (${best.sector}) had the best risk-adjusted return (${best.risk_adjusted_return}) — the most reward per unit of volatility over the period.`);
+      findings.push(`<strong>${worst.ticker}</strong> (${worst.sector}) had the worst risk-adjusted return (${worst.risk_adjusted_return}) — high risk without compensating reward.`);
+    }
+
+    const negCount = summary.company_metrics.filter((c) => c.total_return_pct < 0).length;
+    const pctNeg = Math.round((negCount / summary.company_metrics.length) * 100);
+    findings.push(`${negCount} of ${summary.company_metrics.length} tracked companies (${pctNeg}%) posted a negative total return over the 5-year window — broad NEPSE exposure carried real downside risk, not just volatility.`);
+
+    let maxPair = null;
+    corr.tickers.forEach((t1) => {
+      corr.tickers.forEach((t2) => {
+        if (t1 >= t2) return;
+        const v = corr.matrix[t1]?.[t2];
+        if (v === null || v === undefined) return;
+        if (!maxPair || v > maxPair.v) maxPair = { t1, t2, v };
+      });
+    });
+    if (maxPair) {
+      findings.push(`<strong>${maxPair.t1}</strong> and <strong>${maxPair.t2}</strong> have the highest return correlation in the dataset (r = ${maxPair.v.toFixed(2)}) — holding both offers limited real diversification.`);
+    }
+
+    listEl.innerHTML = findings.map((f) => `<li>${f}</li>`).join("");
+  } catch (err) {
+    listEl.innerHTML = `<li style="color: var(--text-muted);">${friendlyFetchError(err)}</li>`;
+  }
+}
