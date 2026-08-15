@@ -1,0 +1,328 @@
+import { API_BASE, CHART_COLORS, showLoading, showError, friendlyFetchError } from "./utils.js";
+
+let mainChart = null;
+let compareChart = null;
+let currentChartType = "volatility";
+let currentTickerData = null;
+
+const CHART_CAPTIONS = {
+  volatility: "30-day rolling volatility. Higher swings mean it's harder for a new investor to judge whether a price move is noise or a real trend.",
+  drawdown: "Drawdown shows how far the price has fallen from its most recent peak — the metric that actually triggers panic-selling.",
+  trend: "Price with 20-day and 50-day moving averages, used to separate real trend from short-term noise.",
+  volume: "Days where trading volume exceeded 2× its 20-day average, a proxy for FOMO buying or panic selling.",
+};
+
+export function setupChartTabs() {
+  document.querySelectorAll(".chart-tab-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".chart-tab-btn").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentChartType = btn.dataset.chart;
+      if (currentTickerData) renderMainChart(currentTickerData);
+    });
+  });
+}
+
+export async function loadTickerList() {
+  const track = document.getElementById("tickerTrack");
+  const select = document.getElementById("tickerSelect");
+
+  try {
+    const res = await fetch(`${API_BASE}/tickers`);
+    if (!res.ok) throw new Error("Couldn't load ticker list.");
+    const tickers = await res.json();
+
+    select.innerHTML = tickers
+      .map((t) => `<option value="${t.ticker}">${t.ticker} — ${t.sector}</option>`)
+      .join("");
+    select.value = "NABIL";
+
+    const items = tickers.map((t) => `<span class="ticker-item">${t.ticker} · ${t.sector}</span>`);
+    track.innerHTML = items.concat(items).join("");
+    populateCompareControls(tickers);
+  } catch (err) {
+    track.innerHTML = `<span class="ticker-item">${friendlyFetchError(err)}</span>`;
+    select.innerHTML = `<option value="">No companies available</option>`;
+    showError("marketError", friendlyFetchError(err));
+    showLoading("marketLoading", false);
+  }
+}
+
+function populateCompareControls(tickers) {
+  const container = document.getElementById("compareControls");
+  const defaults = new Set(["NABIL", "NHPC", "NLIC"]);
+
+  container.innerHTML = tickers
+    .map((t) => `
+      <label class="compare-pill ${defaults.has(t.ticker) ? "checked" : ""}">
+        <input type="checkbox" value="${t.ticker}" ${defaults.has(t.ticker) ? "checked" : ""}>
+        ${t.ticker}
+      </label>
+    `)
+    .join("");
+
+  container.querySelectorAll(".compare-pill input").forEach((cb) => {
+    cb.addEventListener("change", () => {
+      cb.closest(".compare-pill").classList.toggle("checked", cb.checked);
+    });
+  });
+}
+
+export async function loadTickerView() {
+  const ticker = document.getElementById("tickerSelect").value;
+  const start = document.getElementById("startDate").value;
+  const end = document.getElementById("endDate").value;
+
+  showError("marketError", null);
+  showLoading("marketLoading", true);
+  document.getElementById("summaryCards").innerHTML = "";
+
+  try {
+    const res = await fetch(`${API_BASE}/market/${ticker}?start=${start}&end=${end}`);
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      const msg = body.error || `No data available for ${ticker} in that date range.`;
+      showError("marketError", msg);
+      currentTickerData = null;
+      if (mainChart) { mainChart.destroy(); mainChart = null; }
+      return;
+    }
+
+    const data = await res.json();
+    currentTickerData = data;
+    renderSummaryCards(data.summary);
+    renderMainChart(data);
+    renderExtremeDays(data.extreme_days);
+  } catch (err) {
+    showError("marketError", friendlyFetchError(err));
+    currentTickerData = null;
+  } finally {
+    showLoading("marketLoading", false);
+  }
+}
+
+function renderExtremeDays(extremeDays) {
+  const bestBody = document.querySelector("#bestDaysTable tbody");
+  const worstBody = document.querySelector("#worstDaysTable tbody");
+
+  if (!extremeDays) {
+    bestBody.innerHTML = worstBody.innerHTML = "";
+    return;
+  }
+
+  bestBody.innerHTML = extremeDays.best
+    .map((d) => `<tr><td>${d.date}</td><td class="pos">+${d.return_pct}%</td><td>Rs. ${d.close}</td></tr>`)
+    .join("");
+
+  worstBody.innerHTML = extremeDays.worst
+    .map((d) => `<tr><td>${d.date}</td><td class="neg">${d.return_pct}%</td><td>Rs. ${d.close}</td></tr>`)
+    .join("");
+}
+
+function renderSummaryCards(summary) {
+  const ddClass = summary.max_drawdown !== null && summary.max_drawdown < -0.2 ? "neg" : "accent";
+  document.getElementById("summaryCards").innerHTML = `
+    <div class="summary-card">
+      <div class="card-label">${summary.ticker} — Sector</div>
+      <div class="card-value accent">${summary.sector}</div>
+    </div>
+    <div class="summary-card">
+      <div class="card-label">Latest Close</div>
+      <div class="card-value">Rs. ${summary.latest_close}</div>
+    </div>
+    <div class="summary-card">
+      <div class="card-label metric-hint" title="How much this stock's daily price swings, averaged over the last 30 trading days. Higher = harder to tell real trend from noise.">Avg Volatility (30d)</div>
+      <div class="card-value">${summary.avg_volatility ?? "—"}</div>
+    </div>
+    <div class="summary-card">
+      <div class="card-label metric-hint" title="How far the price has fallen from its most recent peak. This is the number that actually triggers panic-selling.">Max Drawdown</div>
+      <div class="card-value ${ddClass}">${summary.max_drawdown !== null ? (summary.max_drawdown * 100).toFixed(1) + "%" : "—"}</div>
+    </div>
+    <div class="summary-card">
+      <div class="card-label metric-hint" title="Days where trading volume exceeded 2x its 20-day average — a sign of crowd behaviour like FOMO buying or panic selling.">Volume Spike Days</div>
+      <div class="card-value">${summary.volume_spike_days}</div>
+    </div>
+    <div class="summary-card">
+      <div class="card-label metric-hint" title="The daily loss threshold historically exceeded only 5% of the time. On a bad day, you could realistically lose more than this in a single session.">Value at Risk (95%)</div>
+      <div class="card-value neg">${summary.var_95 !== null ? (summary.var_95 * 100).toFixed(1) + "%" : "—"}</div>
+    </div>
+  `;
+}
+
+function renderMainChart(data) {
+  document.getElementById("chartCaption").textContent = CHART_CAPTIONS[currentChartType];
+
+  const ctx = document.getElementById("mainChart").getContext("2d");
+  if (mainChart) mainChart.destroy();
+
+  const s = data.series;
+  let datasets, yLabel;
+
+  if (currentChartType === "volatility") {
+    datasets = [{ label: "30d Volatility", data: s.volatility_30d, borderColor: CHART_COLORS.accent, borderWidth: 1.6, pointRadius: 0, tension: 0.15 }];
+    yLabel = "Volatility";
+  } else if (currentChartType === "drawdown") {
+    datasets = [{ label: "Drawdown", data: s.drawdown, borderColor: CHART_COLORS.red, borderWidth: 1.6, pointRadius: 0, fill: true, backgroundColor: "rgba(196,85,77,0.12)", tension: 0.1 }];
+    yLabel = "Drawdown";
+  } else if (currentChartType === "trend") {
+    datasets = [
+      { label: "Close", data: s.close, borderColor: "rgba(232,234,237,0.35)", borderWidth: 1, pointRadius: 0 },
+      { label: "MA 20", data: s.ma_20, borderColor: CHART_COLORS.accent, borderWidth: 1.6, pointRadius: 0 },
+      { label: "MA 50", data: s.ma_50, borderColor: CHART_COLORS.purple, borderWidth: 1.6, pointRadius: 0 },
+    ];
+    yLabel = "Price (NPR)";
+  } else {
+    datasets = [{
+      label: "Volume",
+      data: s.volume,
+      backgroundColor: s.volume_spike.map((sp) => (sp ? CHART_COLORS.red : "rgba(212,162,78,0.35)")),
+      type: "bar",
+    }];
+    yLabel = "Traded Quantity";
+  }
+
+  mainChart = new Chart(ctx, {
+    type: currentChartType === "volume" ? "bar" : "line",
+    data: { labels: s.dates, datasets },
+    options: {
+      responsive: true,
+      interaction: { mode: "index", intersect: false },
+      scales: {
+        x: { ticks: { maxTicksLimit: 8, font: { size: 10 } }, grid: { color: CHART_COLORS.grid } },
+        y: { title: { display: true, text: yLabel, color: CHART_COLORS.muted }, grid: { color: CHART_COLORS.grid } },
+      },
+      plugins: { legend: { labels: { boxWidth: 12, font: { size: 11 } } } },
+    },
+  });
+}
+
+export async function loadMarketSummaryTable() {
+  const tbody = document.querySelector("#companyTable tbody");
+  try {
+    const res = await fetch(`${API_BASE}/market/summary`);
+    if (!res.ok) throw new Error("Couldn't load the company overview table.");
+    const data = await res.json();
+    tbody.innerHTML = data.company_metrics
+      .map((r) => {
+        const retClass = r.total_return_pct >= 0 ? "pos" : "neg";
+        const raClass = (r.risk_adjusted_return ?? 0) >= 0 ? "pos" : "neg";
+        return `<tr>
+          <td>${r.ticker}</td>
+          <td>${r.sector}</td>
+          <td>Rs. ${r.start_price}</td>
+          <td>Rs. ${r.latest_price}</td>
+          <td class="${retClass}">${r.total_return_pct}%</td>
+          <td>${r.volatility_pct}%</td>
+          <td class="${raClass}">${r.risk_adjusted_return ?? "—"}</td>
+          <td>${Number(r.avg_daily_volume).toLocaleString()}</td>
+        </tr>`;
+      })
+      .join("");
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="7" style="color: var(--text-muted);">${friendlyFetchError(err)}</td></tr>`;
+  }
+}
+
+function correlationColor(value) {
+  if (value === null) return "transparent";
+  const intensity = Math.min(Math.abs(value), 1);
+  if (value >= 0) {
+    return `rgba(212, 162, 78, ${0.12 + intensity * 0.55})`;
+  }
+  return `rgba(196, 85, 77, ${0.12 + intensity * 0.55})`;
+}
+
+export async function loadCorrelationTable() {
+  const table = document.getElementById("correlationTable");
+  try {
+    const res = await fetch(`${API_BASE}/market/correlation`);
+    if (!res.ok) throw new Error("Couldn't load correlation data.");
+    const data = await res.json();
+    const tickers = data.tickers;
+
+    let html = "<thead><tr><th></th>";
+    tickers.forEach((t) => (html += `<th>${t}</th>`));
+    html += "</tr></thead><tbody>";
+
+    tickers.forEach((rowTicker) => {
+      html += `<tr><th>${rowTicker}</th>`;
+      tickers.forEach((colTicker) => {
+        const value = data.matrix[rowTicker] ? data.matrix[rowTicker][colTicker] : null;
+        const display = value === null ? "—" : value.toFixed(2);
+        html += `<td style="background:${correlationColor(value)}; text-align:center;">${display}</td>`;
+      });
+      html += "</tr>";
+    });
+    html += "</tbody>";
+    table.innerHTML = html;
+  } catch (err) {
+    table.innerHTML = `<tr><td style="color: var(--text-muted);">${friendlyFetchError(err)}</td></tr>`;
+  }
+}
+
+export async function loadComparisonChart() {
+  const checked = Array.from(document.querySelectorAll("#compareControls input:checked")).map((cb) => cb.value);
+
+  if (checked.length === 0) {
+    return;
+  }
+  if (checked.length > 5) {
+    alert("Please select 5 companies or fewer for a readable comparison.");
+    return;
+  }
+
+  const start = document.getElementById("startDate").value;
+  const end = document.getElementById("endDate").value;
+
+  const palette = [CHART_COLORS.accent, CHART_COLORS.purple, CHART_COLORS.green, CHART_COLORS.red, "#5DADE2"];
+
+  const results = await Promise.all(
+    checked.map((ticker) =>
+      fetch(`${API_BASE}/market/${ticker}?start=${start}&end=${end}`)
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null)
+    )
+  );
+
+  const datasets = [];
+  let labels = [];
+
+  results.forEach((data, i) => {
+    if (!data || !data.series || data.series.close.length === 0) return;
+    const closes = data.series.close;
+    const base = closes[0];
+    const normalized = closes.map((c) => Math.round((c / base) * 10000) / 100);
+
+    if (normalized.length > labels.length) labels = data.series.dates;
+
+    datasets.push({
+      label: checked[i],
+      data: normalized,
+      borderColor: palette[i % palette.length],
+      borderWidth: 1.8,
+      pointRadius: 0,
+      tension: 0.1,
+    });
+  });
+
+  const ctx = document.getElementById("compareChart").getContext("2d");
+  if (compareChart) compareChart.destroy();
+
+  compareChart = new Chart(ctx, {
+    type: "line",
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      interaction: { mode: "index", intersect: false },
+      scales: {
+        x: { ticks: { maxTicksLimit: 8, font: { size: 10 } }, grid: { color: CHART_COLORS.grid } },
+        y: {
+          title: { display: true, text: "Value (start = 100)", color: CHART_COLORS.muted },
+          grid: { color: CHART_COLORS.grid },
+        },
+      },
+      plugins: { legend: { labels: { boxWidth: 12, font: { size: 11 } } } },
+    },
+  });
+}
