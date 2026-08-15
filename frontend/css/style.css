@@ -629,3 +629,48 @@ main { padding: 1.75rem 2rem 3rem; max-width: 1280px; margin: 0 auto; }
   line-height: 1.55;
   margin: 0;
 }
+
+/* ===========================================================
+   Risk Readiness Check
+   =========================================================== */
+.readiness-panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+}
+.readiness-form {
+  display: grid;
+  gap: 1.1rem;
+  max-width: 520px;
+}
+.readiness-form .field-label { margin: 0; }
+.readiness-form select { width: 100%; }
+.readiness-result {
+  margin-top: 1.5rem;
+  padding: 1.1rem 1.25rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  font-size: 0.87rem;
+  line-height: 1.6;
+  display: none;
+}
+.readiness-result.show { display: block; }
+.readiness-result.match {
+  border-color: rgba(78, 155, 110, 0.4);
+  background: rgba(78, 155, 110, 0.08);
+  color: var(--text);
+}
+.readiness-result.mismatch {
+  border-color: rgba(196, 85, 77, 0.4);
+  background: rgba(196, 85, 77, 0.08);
+  color: var(--text);
+}
+.readiness-result .result-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.98rem;
+  margin: 0 0 0.5rem;
+}
+.readiness-result .result-title.match { color: var(--gain-green); }
+.readiness-result .result-title.mismatch { color: var(--risk-red); }

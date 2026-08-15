@@ -112,6 +112,38 @@
       </div>
 
       <div class="section-block">
+        <h2 class="section-title">Risk Readiness Check</h2>
+        <p class="section-sub">A quick self-assessment comparing your stated risk tolerance against this dataset's real sector volatility — the same mismatch that drives many of the survey-reported challenges above.</p>
+        <div class="readiness-panel">
+          <form class="readiness-form" id="readinessForm">
+            <div>
+              <label class="field-label" for="rExperience">How long have you been investing (or planning to)?</label>
+              <select id="rExperience" class="field-input">
+                <option value="<1 year">Less than 1 year / not yet started</option>
+                <option value="1-3 years">1–3 years</option>
+                <option value="3-5 years">3–5 years</option>
+                <option value="5+ years">5+ years</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label" for="rReaction">A stock you hold drops 20% overnight on no company-specific news. What do you do?</label>
+              <select id="rReaction" class="field-input">
+                <option value="sell">Sell immediately to stop further loss</option>
+                <option value="hold">Hold and wait to see what happens</option>
+                <option value="buy">Buy more — it looks like a discount</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label" for="rSector">Which sector are you most interested in?</label>
+              <select id="rSector" class="field-input"></select>
+            </div>
+            <button type="submit" class="primary-btn" style="width: auto;">Check my readiness</button>
+          </form>
+          <div class="readiness-result" id="readinessResult"></div>
+        </div>
+      </div>
+
+      <div class="section-block">
         <h2 class="section-title">Best &amp; Worst Single-Day Moves</h2>
         <p class="section-sub">
           The single most extreme trading days for the selected company in the chosen date range —
