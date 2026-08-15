@@ -79,6 +79,33 @@ def analyze_survey():
     }
 
 
+def compute_sector_linkage(sector_metrics):
+    """
+    Links each sector's real market volatility to survey respondents'
+    self-reported "market volatility difficulty" score for that sector —
+    connecting the two halves of the study directly.
+    """
+    df = pd.read_csv(SURVEY_PATH)
+
+    def respondent_sectors(sectors_str):
+        return [s.strip() for s in str(sectors_str).split(",")]
+
+    exploded = df.assign(sector=df["sectors_invested"].apply(respondent_sectors)).explode("sector")
+    perceived = (
+        exploded.groupby("sector")["volatility_difficulty"]
+        .mean()
+        .round(2)
+        .rename("perceived_difficulty")
+    )
+
+    real_vol = sector_metrics.set_index("sector")["avg_volatility_pct"].rename("real_volatility_pct")
+
+    linked = pd.concat([real_vol, perceived], axis=1).dropna().reset_index()
+    linked = linked.rename(columns={"index": "sector"})
+
+    return linked.to_dict(orient="records")
+
+
 def statistical_analysis(sector_metrics):
     """Correlation and regression analysis linking investor traits to reported challenges."""
     import statsmodels.api as sm

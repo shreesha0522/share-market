@@ -114,6 +114,18 @@ def api_survey_stats():
     return jsonify(result)
 
 
+@app.route("/api/survey/linkage")
+def api_survey_linkage():
+    """Links each sector's real market volatility to survey respondents' perceived difficulty for it."""
+    if not os.path.exists(survey.SURVEY_PATH):
+        return jsonify({"error": "Survey data not found"}), 404
+    all_data = market.load_market_data_all()
+    company_metrics = market.compute_company_metrics(all_data)
+    sector_metrics = market.compute_sector_metrics(company_metrics)
+    linkage = survey.compute_sector_linkage(sector_metrics)
+    return jsonify({"linkage": linkage, "is_synthetic": True})
+
+
 @app.route("/api/health")
 def api_health():
     """Simple liveness check for the API."""
