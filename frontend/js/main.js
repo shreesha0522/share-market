@@ -43,6 +43,7 @@ async function init() {
   await loadCorrelationTable();
   await loadSurveySummary();
   await loadSurveyStats();
+  await loadSectorLinkage();
 
   document.getElementById("loadBtn").addEventListener("click", loadTickerView);
   document.getElementById("compareBtn").addEventListener("click", loadComparisonChart);
@@ -448,6 +449,59 @@ async function loadSurveySummary() {
     },
     options: { responsive: true, plugins: { legend: { position: "bottom", labels: { boxWidth: 12, font: { size: 11 } } } } },
   });
+}
+
+async function loadSectorLinkage() {
+  try {
+    const res = await fetch(`${API_BASE}/survey/linkage`);
+    if (!res.ok) return;
+    const data = await res.json();
+    const linkage = data.linkage;
+
+    new Chart(document.getElementById("linkageChart"), {
+      type: "bar",
+      data: {
+        labels: linkage.map((r) => r.sector),
+        datasets: [
+          {
+            label: "Real Volatility (%)",
+            data: linkage.map((r) => r.real_volatility_pct),
+            backgroundColor: CHART_COLORS.accent,
+            yAxisID: "y",
+          },
+          {
+            label: "Perceived Difficulty (1-5)",
+            data: linkage.map((r) => r.perceived_difficulty),
+            backgroundColor: CHART_COLORS.purple,
+            yAxisID: "y1",
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            type: "linear",
+            position: "left",
+            title: { display: true, text: "Real Volatility (%)", color: CHART_COLORS.accent },
+            grid: { color: CHART_COLORS.grid },
+          },
+          y1: {
+            type: "linear",
+            position: "right",
+            min: 0,
+            max: 5,
+            title: { display: true, text: "Perceived Difficulty (1-5)", color: CHART_COLORS.purple },
+            grid: { drawOnChartArea: false },
+          },
+          x: { grid: { display: false } },
+        },
+        plugins: { legend: { labels: { boxWidth: 12, font: { size: 11 } } } },
+      },
+    });
+  } catch (err) {
+    // Silently skip — this is a supplementary chart, not critical path.
+  }
 }
 
 async function loadSurveyStats() {
