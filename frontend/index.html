@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>New Investor Risk Monitor — NEPSE</title>
+<meta name="description" content="A Bachelor's thesis dashboard analysing NEPSE market risk data alongside survey-based research into the challenges new investors face in the Nepali share market.">
+<meta name="author" content="Your Name — Your University">
+<meta property="og:title" content="New Investor Risk Monitor — NEPSE">
+<meta property="og:description" content="Market data & survey-based analysis of challenges faced by new investors in the Nepali share market.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0F1419">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
@@ -24,12 +30,14 @@
       <div class="brand-text">
         <div class="brand-title">New Investor Risk Monitor</div>
         <div class="brand-sub">NEPSE market behaviour &amp; investor-reported challenges</div>
+        <div class="brand-byline">Bachelor's Thesis · <span data-fill="author">Shreesha Shrestha</span> · <span data-fill="university">Softwarica College · Coventry University</span> · 2026</div>
       </div>
     </div>
     <nav class="tabs" id="mainTabs">
       <button class="tab-btn active" data-tab="market">Market Data</button>
       <button class="tab-btn" data-tab="survey">Survey Insights</button>
       <button class="tab-btn" data-tab="about">About This Study</button>
+      <button class="tab-btn print-btn" id="printBtn" type="button" title="Print or save this page as PDF">Export PDF</button>
     </nav>
   </header>
 
@@ -189,6 +197,14 @@
       </div>
 
       <div class="section-block">
+        <h2 class="section-title">Challenge Score by Age Group</h2>
+        <p class="section-sub">Average overall challenge score reported by respondents in each age bracket.</p>
+        <div class="chart-panel">
+          <canvas id="ageChart" height="100" role="img" aria-label="Bar chart showing average challenge score by age group"></canvas>
+        </div>
+      </div>
+
+      <div class="section-block">
         <h2 class="section-title">Real Risk vs. Perceived Difficulty</h2>
         <p class="section-sub">
           Each sector's actual market volatility, compared to how difficult survey respondents who
@@ -203,6 +219,14 @@
       <div class="section-block">
         <h2 class="section-title">Statistical Findings</h2>
         <div class="stats-grid" id="statsGrid">
+          <!-- populated by JS -->
+        </div>
+      </div>
+
+      <div class="section-block">
+        <h2 class="section-title">Key Findings</h2>
+        <p class="section-sub">Plain-language summary of the statistical results above, generated from the current dataset.</p>
+        <div class="findings-card" id="keyFindings">
           <!-- populated by JS -->
         </div>
       </div>

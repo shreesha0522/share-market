@@ -17,6 +17,11 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
 
 setupChartTabs();
 
+const printBtn = document.getElementById("printBtn");
+if (printBtn) {
+  printBtn.addEventListener("click", () => window.print());
+}
+
 async function init() {
   await loadTickerList();
   await loadTickerView();

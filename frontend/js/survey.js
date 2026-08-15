@@ -1,5 +1,9 @@
 import { API_BASE, CHART_COLORS, showLoading, showError, friendlyFetchError } from "./utils.js";
 
+let _summary = null;
+let _stats = null;
+let _linkage = null;
+
 export async function loadSurveySummary() {
   showError("surveyError", null);
   showLoading("surveyLoading", true);
@@ -50,6 +54,19 @@ export async function loadSurveySummary() {
     },
   });
 
+  new Chart(document.getElementById("ageChart"), {
+    type: "bar",
+    data: {
+      labels: data.by_age.map((r) => r.segment),
+      datasets: [{ label: "Avg challenge score", data: data.by_age.map((r) => r.avg_challenge_score), backgroundColor: CHART_COLORS.green }],
+    },
+    options: {
+      responsive: true,
+      scales: { y: { min: 0, max: 5, grid: { color: CHART_COLORS.grid } }, x: { grid: { display: false } } },
+      plugins: { legend: { display: false } },
+    },
+  });
+
   const profitLabels = Object.keys(data.profitability_pct);
   new Chart(document.getElementById("profitChart"), {
     type: "doughnut",
@@ -64,6 +81,9 @@ export async function loadSurveySummary() {
     },
     options: { responsive: true, plugins: { legend: { position: "bottom", labels: { boxWidth: 12, font: { size: 11 } } } } },
   });
+
+  _summary = data;
+  renderKeyFindings();
 }
 
 export async function loadSectorLinkage() {
@@ -114,6 +134,8 @@ export async function loadSectorLinkage() {
         plugins: { legend: { labels: { boxWidth: 12, font: { size: 11 } } } },
       },
     });
+    _linkage = linkage;
+    renderKeyFindings();
   } catch (err) {
     // Silently skip — this is a supplementary chart, not critical path.
   }
@@ -150,4 +172,90 @@ export async function loadSurveyStats() {
       <div class="stat-note">Predictors: experience, portfolio size, trade frequency.</div>
     </div>
   `;
+
+  _stats = data;
+  renderKeyFindings();
+}
+
+const PREDICTOR_LABELS = {
+  experience_ordinal: "investing experience",
+  portfolio_ordinal: "portfolio size",
+  trade_freq_ordinal: "trade frequency",
+};
+
+function renderKeyFindings() {
+  const el = document.getElementById("keyFindings");
+  if (!el) return;
+  if (!_summary || !_stats) {
+    el.innerHTML = `<p class="finding-empty">Findings will appear once survey data has loaded.</p>`;
+    return;
+  }
+
+  const points = [];
+
+  const top = _summary.ranked_challenges[0];
+  if (top) {
+    points.push(
+      `The most widely reported challenge among ${_summary.n_respondents} respondents is <strong>${top.challenge}</strong> (avg score ${top.avg_score}/5).`
+    );
+  }
+
+  const exp = _stats.experience_vs_challenge_correlation;
+  if (exp) {
+    const strength = Math.abs(exp.r) > 0.5 ? "strong" : Math.abs(exp.r) > 0.3 ? "moderate" : "weak";
+    const direction = exp.r < 0 ? "fewer" : "more";
+    const sig = exp.p_value < 0.05 ? "statistically significant" : "not statistically significant at the 0.05 level";
+    points.push(
+      `Investing experience shows a ${strength} correlation with reported challenges (r = ${exp.r}, ${sig}) — more experienced investors tend to report ${direction} challenges overall.`
+    );
+  }
+
+  const vol = _stats.volatility_vs_perceived_difficulty_correlation;
+  if (vol) {
+    const tracks = Math.abs(vol.r) > 0.4;
+    points.push(
+      tracks
+        ? `Perceived difficulty tracks real market volatility reasonably well (r = ${vol.r}), suggesting respondents can broadly distinguish riskier sectors.`
+        : `Perceived difficulty only weakly tracks real market volatility (r = ${vol.r}), suggesting many respondents are not accurately distinguishing higher-risk sectors from lower-risk ones.`
+    );
+  }
+
+  if (_linkage && _linkage.length > 0) {
+    const withGap = _linkage.map((r) => ({
+      ...r,
+      gap: (r.real_volatility_pct / Math.max(...(_linkage.map((x) => x.real_volatility_pct)))) -
+           (r.perceived_difficulty / 5),
+    }));
+    const underrated = withGap.reduce((a, b) => (b.gap > a.gap ? b : a));
+    if (underrated.gap > 0.15) {
+      points.push(
+        `<strong>${underrated.sector}</strong> stands out as a sector where real volatility (${underrated.real_volatility_pct}%) is high relative to how difficult respondents rated it (${underrated.perceived_difficulty}/5) — a potential blind spot for new investors.`
+      );
+    }
+  }
+
+  const reg = _stats.regression;
+  if (reg) {
+    const sigPredictors = Object.entries(reg.coefficients)
+      .filter(([name, c]) => name !== "const" && c.p_value < 0.05)
+      .sort((a, b) => Math.abs(b[1].coef) - Math.abs(a[1].coef));
+    if (sigPredictors.length > 0) {
+      const [name, c] = sigPredictors[0];
+      points.push(
+        `In the regression model (R² = ${reg.r_squared}), <strong>${PREDICTOR_LABELS[name] || name}</strong> is the strongest significant predictor of overall challenge score (coef = ${c.coef}, p = ${c.p_value}).`
+      );
+    } else {
+      points.push(
+        `In the regression model (R² = ${reg.r_squared}), none of the three predictors reached statistical significance at the 0.05 level — overall challenge score may be driven more by factors not captured in this survey.`
+      );
+    }
+  }
+
+  if (_summary.is_synthetic) {
+    points.push(
+      `<em>Note: these findings are currently based on synthetic placeholder data and should not be cited until real survey responses replace it.</em>`
+    );
+  }
+
+  el.innerHTML = `<ul>${points.map((p) => `<li>${p}</li>`).join("")}</ul>`;
 }
