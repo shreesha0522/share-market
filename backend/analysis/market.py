@@ -3,6 +3,7 @@ market.py — Market data loading and analysis for NEPSE historical price data.
 """
 
 import os
+from typing import Optional
 
 import pandas as pd
 
@@ -18,7 +19,7 @@ SECTOR_MAP = {
 }
 
 
-def load_ticker(ticker, start=None, end=None):
+def load_ticker(ticker: str, start: Optional[str] = None, end: Optional[str] = None) -> Optional[pd.DataFrame]:
     """Load one ticker's price history and compute volatility, drawdown, moving averages, and volume spikes."""
     path = os.path.join(MARKET_DIR, f"{ticker}.csv")
     if not os.path.exists(path):
@@ -48,7 +49,7 @@ def load_ticker(ticker, start=None, end=None):
     return df
 
 
-def load_market_data_all():
+def load_market_data_all() -> pd.DataFrame:
     """Load and concatenate all tickers' price histories for cross-company analysis."""
     frames = []
     for ticker, sector in SECTOR_MAP.items():
@@ -66,7 +67,7 @@ def load_market_data_all():
     return pd.concat(frames, ignore_index=True)
 
 
-def compute_company_metrics(all_data, recent_years=5):
+def compute_company_metrics(all_data: pd.DataFrame, recent_years: int = 5) -> pd.DataFrame:
     """Compute 5-year return, volatility, and risk-adjusted return for each company."""
     cutoff = all_data["published_date"].max() - pd.DateOffset(years=recent_years)
     recent = all_data[all_data["published_date"] >= cutoff]
@@ -93,7 +94,7 @@ def compute_company_metrics(all_data, recent_years=5):
     return pd.DataFrame(metrics).sort_values("volatility_pct", ascending=False)
 
 
-def compute_sector_metrics(company_metrics):
+def compute_sector_metrics(company_metrics: pd.DataFrame) -> pd.DataFrame:
     """Aggregate company metrics up to sector-level averages, including risk-adjusted return."""
     result = (
         company_metrics.groupby("sector")
@@ -112,7 +113,7 @@ def compute_sector_metrics(company_metrics):
     return result
 
 
-def compute_extreme_days(df):
+def compute_extreme_days(df: pd.DataFrame) -> dict:
     """Return the 5 best and 5 worst single-day return days for a ticker's price history."""
     returns_with_dates = df["Daily Return"].dropna()
     best_days = returns_with_dates.nlargest(5)
@@ -131,13 +132,13 @@ def compute_extreme_days(df):
     return {"best": to_day_list(best_days), "worst": to_day_list(worst_days)}
 
 
-def compute_value_at_risk(df):
+def compute_value_at_risk(df: pd.DataFrame) -> Optional[float]:
     """95% historical Value at Risk: the daily loss threshold exceeded only 5% of the time."""
     returns = df["Daily Return"].dropna()
     return None if returns.empty else round(float(returns.quantile(0.05)), 4)
 
 
-def compute_correlation_matrix():
+def compute_correlation_matrix() -> pd.DataFrame:
     """
     Correlation matrix of daily returns across all companies.
     Shows whether holding multiple stocks actually diversifies risk —
