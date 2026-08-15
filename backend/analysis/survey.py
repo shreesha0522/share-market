@@ -3,6 +3,7 @@ survey.py — Survey data analysis: challenge scoring, demographic breakdowns, a
 """
 
 import os
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -37,7 +38,7 @@ PORTFOLIO_ORDER = {
 TRADE_FREQ_ORDER = {"Rarely": 1, "A few times a year": 2, "Monthly": 3, "Weekly": 4, "Daily": 5}
 
 
-def analyze_survey():
+def analyze_survey() -> dict[str, Any]:
     """Return ranked challenges, demographic breakdowns, and profitability/confidence stats."""
     df = pd.read_csv(SURVEY_PATH)
 
@@ -79,7 +80,7 @@ def analyze_survey():
     }
 
 
-def compute_sector_linkage(sector_metrics):
+def compute_sector_linkage(sector_metrics: pd.DataFrame) -> list[dict[str, Any]]:
     """
     Links each sector's real market volatility to survey respondents'
     self-reported "market volatility difficulty" score for that sector —
@@ -106,7 +107,7 @@ def compute_sector_linkage(sector_metrics):
     return linked.to_dict(orient="records")
 
 
-def statistical_analysis(sector_metrics):
+def statistical_analysis(sector_metrics: pd.DataFrame) -> dict[str, Any]:
     """Correlation and regression analysis linking investor traits to reported challenges."""
     import statsmodels.api as sm
     from scipy import stats
