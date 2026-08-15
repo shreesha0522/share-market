@@ -7,13 +7,19 @@ and analysis/survey.py.
 import os
 
 import pandas as pd
+from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 from analysis import market, survey
 
+load_dotenv()  # loads variables from a .env file if present, falls back to defaults below
+
 app = Flask(__name__)
 CORS(app)
+
+FLASK_PORT = int(os.environ.get("FLASK_PORT", 5000))
+FLASK_DEBUG = os.environ.get("FLASK_DEBUG", "true").lower() == "true"
 
 
 @app.route("/api/tickers")
@@ -143,4 +149,4 @@ def server_error(e):
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(debug=FLASK_DEBUG, port=FLASK_PORT)
