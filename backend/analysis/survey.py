@@ -9,7 +9,16 @@ import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-SURVEY_PATH = os.path.join(PROJECT_ROOT, "data", "survey", "survey_synthetic.csv")
+SURVEY_DIR = os.path.join(PROJECT_ROOT, "data", "survey")
+REAL_SURVEY_PATH = os.path.join(SURVEY_DIR, "survey_real.csv")
+SYNTHETIC_SURVEY_PATH = os.path.join(SURVEY_DIR, "survey_synthetic.csv")
+
+# Prefer real respondent data when it exists; fall back to synthetic
+# placeholder data otherwise. This means no other code needs to change
+# once real survey_real.csv is generated via scripts/convert_survey_responses.py.
+SURVEY_PATH = REAL_SURVEY_PATH if os.path.exists(REAL_SURVEY_PATH) else SYNTHETIC_SURVEY_PATH
+
+
 def is_synthetic_data() -> bool:
     """True if the survey CSV currently in use is the synthetic placeholder file, not real responses."""
     return "synthetic" in os.path.basename(SURVEY_PATH).lower()
@@ -60,6 +69,7 @@ def analyze_survey() -> dict[str, Any]:
         .reindex(["<1 year", "1-3 years", "3-5 years", "5+ years"])
         .reset_index()
         .rename(columns={"years_investing": "experience", "overall_challenge_score": "avg_challenge_score"})
+        .dropna(subset=["avg_challenge_score"])  # drop experience brackets with no respondents (small real samples)
     )
 
     by_age = (

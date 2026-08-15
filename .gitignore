@@ -6,3 +6,4 @@ __pycache__/
 .pytest_cache/
 *.egg-info/
 .coverage
+data/survey/survey_real.csv
