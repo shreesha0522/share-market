@@ -1,0 +1,100 @@
+openapi: 3.0.3
+info:
+  title: New Investor Risk Monitor API
+  description: >
+    Backend API for the thesis "Analysis and Identification of Challenges
+    Faced by New Investors in the Share Market Using Survey-Based and Market
+    Data Analysis." Serves computed market risk metrics and survey analysis
+    as JSON.
+  version: 1.0.0
+
+servers:
+  - url: http://127.0.0.1:5000
+    description: Local development server
+
+paths:
+  /api/tickers:
+    get:
+      summary: List all tracked companies and their sectors
+      responses:
+        '200':
+          description: List of tickers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    ticker: { type: string, example: NABIL }
+                    sector: { type: string, example: Banking }
+
+  /api/market/{ticker}:
+    get:
+      summary: Time series and risk metrics for one company
+      parameters:
+        - name: ticker
+          in: path
+          required: true
+          schema: { type: string }
+        - name: start
+          in: query
+          schema: { type: string, format: date }
+        - name: end
+          in: query
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: Summary, time series, and extreme days for the ticker
+        '400':
+          description: Invalid date format
+        '404':
+          description: Unknown ticker or no data in range
+
+  /api/market/summary:
+    get:
+      summary: 5-year company and sector level metrics, including risk-adjusted return
+      responses:
+        '200':
+          description: Company and sector metrics
+
+  /api/market/correlation:
+    get:
+      summary: Correlation matrix of daily returns across all companies
+      responses:
+        '200':
+          description: Correlation matrix
+
+  /api/survey/summary:
+    get:
+      summary: Ranked challenges and demographic breakdowns from the survey
+      responses:
+        '200':
+          description: Survey summary
+        '404':
+          description: Survey data not found
+
+  /api/survey/stats:
+    get:
+      summary: Correlation and regression analysis on survey responses
+      responses:
+        '200':
+          description: Statistical analysis results
+        '404':
+          description: Survey data not found
+
+  /api/survey/linkage:
+    get:
+      summary: Links each sector's real volatility to survey respondents' perceived difficulty for it
+      responses:
+        '200':
+          description: Sector linkage data
+        '404':
+          description: Survey data not found
+
+  /api/health:
+    get:
+      summary: API liveness check
+      responses:
+        '200':
+          description: Status ok
