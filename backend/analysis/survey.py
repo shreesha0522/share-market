@@ -10,6 +10,9 @@ import pandas as pd
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SURVEY_PATH = os.path.join(PROJECT_ROOT, "data", "survey", "survey_synthetic.csv")
+def is_synthetic_data() -> bool:
+    """True if the survey CSV currently in use is the synthetic placeholder file, not real responses."""
+    return "synthetic" in os.path.basename(SURVEY_PATH).lower()
 
 CHALLENGE_COLS = [
     "lacks_knowledge", "hard_to_access_info", "volatility_difficulty",

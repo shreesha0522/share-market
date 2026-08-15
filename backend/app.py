@@ -97,14 +97,13 @@ def api_market_correlation():
         "matrix": corr.to_dict(),
     })
 
-
 @app.route("/api/survey/summary")
 def api_survey_summary():
     """Return ranked challenges, demographic breakdowns, and profitability stats from the survey."""
     if not os.path.exists(survey.SURVEY_PATH):
         return jsonify({"error": "Survey data not found"}), 404
     result = survey.analyze_survey()
-    result["is_synthetic"] = True
+    result["is_synthetic"] = survey.is_synthetic_data()
     return jsonify(result)
 
 
@@ -129,7 +128,7 @@ def api_survey_linkage():
     company_metrics = market.compute_company_metrics(all_data)
     sector_metrics = market.compute_sector_metrics(company_metrics)
     linkage = survey.compute_sector_linkage(sector_metrics)
-    return jsonify({"linkage": linkage, "is_synthetic": True})
+    return jsonify({"linkage": linkage, "is_synthetic": survey.is_synthetic_data()})
 
 
 @app.route("/api/health")
