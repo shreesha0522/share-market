@@ -116,7 +116,7 @@
             <thead>
               <tr>
                 <th>Ticker</th><th>Sector</th><th>Start Price</th><th>Latest Price</th>
-                <th>Total Return</th><th>Volatility</th><th>Risk-Adj. Return</th><th>Avg Daily Volume</th>
+                <th>Total Return</th><th>Volatility</th><th title="Total return divided by volatility — how much reward you got per unit of risk taken, not just raw price movement." class="metric-hint">Risk-Adj. Return</th><th>Avg Daily Volume</th>
               </tr>
             </thead>
             <tbody></tbody>
@@ -220,6 +220,30 @@
           Backend: Flask (Python), serving computed statistics as a JSON API.<br>
           Frontend: static HTML/CSS/JavaScript, charted with Chart.js.
         </p>
+
+        <h2 class="section-title" style="margin-top: 2rem;">Glossary of Metrics</h2>
+        <dl class="glossary">
+          <dt>Volatility (30-day)</dt>
+          <dd>How much a stock's daily price swings over the past 30 trading days. Higher volatility means it's harder to tell whether a price move is meaningful or just noise.</dd>
+
+          <dt>Drawdown</dt>
+          <dd>How far the price has fallen from its most recent peak, shown as a percentage. This is the number that actually triggers panic-selling — a 50% drawdown means the price is half of its recent high.</dd>
+
+          <dt>Value at Risk (95%)</dt>
+          <dd>The daily loss threshold that historically was exceeded only 5% of the time. A VaR of -2% means that on a bad day (1 in 20), you could realistically lose more than 2% in a single session.</dd>
+
+          <dt>Volume Spike</dt>
+          <dd>A day where trading volume was more than double its 20-day average — often a sign of crowd behaviour: FOMO buying or panic selling, rather than considered decision-making.</dd>
+
+          <dt>Risk-Adjusted Return</dt>
+          <dd>Total return divided by volatility. This answers "how much reward did you get for the risk you took," not just "how much did the price move." A stock can have a higher raw return but a worse risk-adjusted return if it was far more volatile getting there.</dd>
+
+          <dt>Correlation</dt>
+          <dd>How closely two companies' daily returns move together, from -1 (move in opposite directions) to +1 (move identically). Values near +1 mean holding both offers little real diversification, even if they're different companies.</dd>
+
+          <dt>Moving Average (MA)</dt>
+          <dd>The average closing price over the last 20 or 50 days. Comparing price to its moving average helps separate a genuine trend from short-term noise.</dd>
+        </dl>
       </div>
     </section>
 

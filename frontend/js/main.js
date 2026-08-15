@@ -285,19 +285,19 @@ function renderSummaryCards(summary) {
       <div class="card-value">Rs. ${summary.latest_close}</div>
     </div>
     <div class="summary-card">
-      <div class="card-label">Avg Volatility (30d)</div>
+      <div class="card-label metric-hint" title="How much this stock's daily price swings, averaged over the last 30 trading days. Higher = harder to tell real trend from noise.">Avg Volatility (30d)</div>
       <div class="card-value">${summary.avg_volatility ?? "—"}</div>
     </div>
     <div class="summary-card">
-      <div class="card-label">Max Drawdown</div>
+      <div class="card-label metric-hint" title="How far the price has fallen from its most recent peak. This is the number that actually triggers panic-selling.">Max Drawdown</div>
       <div class="card-value ${ddClass}">${summary.max_drawdown !== null ? (summary.max_drawdown * 100).toFixed(1) + "%" : "—"}</div>
     </div>
     <div class="summary-card">
-      <div class="card-label">Volume Spike Days</div>
+      <div class="card-label metric-hint" title="Days where trading volume exceeded 2x its 20-day average — a sign of crowd behaviour like FOMO buying or panic selling.">Volume Spike Days</div>
       <div class="card-value">${summary.volume_spike_days}</div>
     </div>
     <div class="summary-card">
-      <div class="card-label">Value at Risk (95%)</div>
+      <div class="card-label metric-hint" title="The daily loss threshold historically exceeded only 5% of the time. On a bad day, you could realistically lose more than this in a single session.">Value at Risk (95%)</div>
       <div class="card-value neg">${summary.var_95 !== null ? (summary.var_95 * 100).toFixed(1) + "%" : "—"}</div>
     </div>
   `;
