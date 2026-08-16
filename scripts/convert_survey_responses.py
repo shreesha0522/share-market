@@ -104,7 +104,13 @@ def convert(raw_path):
     # closest equivalent — there is no direct "Break-even" option in the
     # live form, so that category will not appear in real data.
     if "profitable_experience" in df.columns:
-        df["profitable_experience"] = df["profitable_experience"].replace({"Maybe": "Not sure"})
+        # Normalize free-typed variants/typos seen in real responses (e.g. "Notsure" -> "Not sure")
+        df["profitable_experience"] = (
+            df["profitable_experience"]
+            .astype(str)
+            .str.strip()
+            .replace({"Maybe": "Not sure", "Notsure": "Not sure", "Not Sure": "Not sure"})
+        )
 
     df.insert(0, "response_id", range(1, len(df) + 1))
 
