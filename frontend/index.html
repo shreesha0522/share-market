@@ -36,6 +36,7 @@
     <nav class="tabs" id="mainTabs">
       <button class="tab-btn active" data-tab="market">Market Data</button>
       <button class="tab-btn" data-tab="survey">Survey Insights</button>
+      <button class="tab-btn" data-tab="ml">ML Predictions</button>
       <button class="tab-btn" data-tab="about">About This Study</button>
       <button class="tab-btn print-btn" id="printBtn" type="button" title="Print or save this page as PDF">Export PDF</button>
     </nav>
@@ -278,6 +279,54 @@
         <p class="section-sub">Plain-language summary of the statistical results above, generated from the current dataset.</p>
         <div class="findings-card" id="keyFindings">
           <!-- populated by JS -->
+        </div>
+      </div>
+
+    </section>
+
+    <section id="tab-ml" class="tab-panel">
+
+      <div class="synthetic-banner" id="mlSyntheticBanner" hidden>
+        ⚠ This survey data is <strong>synthetic placeholder data</strong>. ML metrics below
+        should not be cited as real findings until real respondent data replaces it.
+      </div>
+
+      <div class="status-banner error-banner" id="mlError" hidden></div>
+      <div class="loading-indicator" id="mlLoading" hidden>
+        <span class="spinner"></span> Loading ML models…
+      </div>
+
+      <div class="synthetic-banner" id="mlCaveat" hidden></div>
+
+      <div class="section-block">
+        <h2 class="section-title">Predicting Challenge Score (Machine Learning)</h2>
+        <p class="section-sub">
+          A Random Forest regressor predicts each respondent's overall challenge score from
+          their investing traits, benchmarked against a plain linear regression baseline —
+          complementing the OLS regression in Statistical Findings.
+        </p>
+        <div class="stats-grid" id="regStatsGrid"></div>
+        <div class="chart-panel" style="margin-top: 1rem;">
+          <p class="chart-caption">Feature importance — which traits the model relied on most to predict challenge score.</p>
+          <canvas id="regFeatureChart" height="120" role="img" aria-label="Bar chart of feature importance for predicting challenge score"></canvas>
+        </div>
+      </div>
+
+      <div class="section-block">
+        <h2 class="section-title">Classifying High vs. Low Challenge Investors</h2>
+        <p class="section-sub">
+          A Random Forest classifier separates respondents into "high challenge" and
+          "low challenge" groups (split at the sample median) using the same traits.
+        </p>
+        <div class="stats-grid" id="clsStatsGrid"></div>
+        <div class="two-col" style="margin-top: 1rem;">
+          <div class="chart-panel">
+            <p class="chart-caption">Feature importance for the classifier.</p>
+            <canvas id="clsFeatureChart" height="140" role="img" aria-label="Bar chart of feature importance for the high/low challenge classifier"></canvas>
+          </div>
+          <div class="table-scroll">
+            <table class="data-table" id="confusionMatrixTable"></table>
+          </div>
         </div>
       </div>
 
