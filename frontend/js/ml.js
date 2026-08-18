@@ -42,7 +42,7 @@ function renderCaveat(reg, cls) {
   if (!el) return;
 
   const n = reg.n_samples ?? cls.n_samples;
-  const usedHoldout = reg.used_holdout_test_set;
+  const k = reg.cv_folds ?? cls.cv_folds;
 
   if (!n) {
     el.hidden = true;
@@ -50,10 +50,10 @@ function renderCaveat(reg, cls) {
   }
 
   el.hidden = false;
-  if (!usedHoldout) {
-    el.textContent = `Note: with only ${n} respondents, the model was trained on the full sample rather than a held-out test set — the metrics below reflect fit on training data, not out-of-sample accuracy. Treat them as directional, not conclusive.`;
+  if (!k) {
+    el.textContent = `Note: with only ${n} respondents, there wasn't enough data for cross-validated evaluation. Treat any figures shown as illustrative only.`;
   } else {
-    el.textContent = `Note: metrics below are evaluated on a held-out test set of just ${reg.test_set_size ?? cls.test_set_size} respondents (out of ${n} total). With a sample this small, treat these figures as directional early signals, not conclusive results.`;
+    el.textContent = `Note: metrics below use ${k}-fold cross-validation across all ${n} respondents (mean ± standard deviation across folds), rather than a single train/test split — but with a sample this small, treat these figures as directional early signals, not conclusive results.`;
   }
 }
 
@@ -66,25 +66,28 @@ function renderRegression(reg) {
     return;
   }
 
+  const rf = reg.random_forest;
+  const lin = reg.linear_regression_baseline;
+
   grid.innerHTML = `
     <div class="stat-card">
-      <div class="stat-label">Random Forest R²</div>
-      <div class="stat-value">${reg.random_forest.r_squared}</div>
-      <div class="stat-note">MAE: ${reg.random_forest.mae}</div>
+      <div class="stat-label">Random Forest R² (${reg.cv_folds}-fold CV)</div>
+      <div class="stat-value">${rf.r_squared_mean} ± ${rf.r_squared_std}</div>
+      <div class="stat-note">MAE: ${rf.mae_mean} ± ${rf.mae_std}</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Linear Regression R² (baseline)</div>
-      <div class="stat-value">${reg.linear_regression_baseline.r_squared}</div>
-      <div class="stat-note">MAE: ${reg.linear_regression_baseline.mae}</div>
+      <div class="stat-value">${lin.r_squared_mean} ± ${lin.r_squared_std}</div>
+      <div class="stat-note">MAE: ${lin.mae_mean} ± ${lin.mae_std}</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Sample Size</div>
       <div class="stat-value">${reg.n_samples}</div>
-      <div class="stat-note">Test set: ${reg.test_set_size} respondent${reg.test_set_size === 1 ? "" : "s"}</div>
+      <div class="stat-note">${reg.n_imputed_sector_exposure ? `${reg.n_imputed_sector_exposure} had imputed sector exposure` : "All respondents matched tracked sectors"}</div>
     </div>
   `;
 
-  const entries = Object.entries(reg.random_forest.feature_importance).sort((a, b) => b[1] - a[1]);
+  const entries = Object.entries(rf.feature_importance).sort((a, b) => b[1] - a[1]);
 
   if (regChart) regChart.destroy();
   regChart = new Chart(document.getElementById("regFeatureChart"), {
@@ -114,20 +117,20 @@ function renderClassification(cls) {
 
   grid.innerHTML = `
     <div class="stat-card">
-      <div class="stat-label">Accuracy</div>
-      <div class="stat-value">${(cls.accuracy * 100).toFixed(0)}%</div>
+      <div class="stat-label">Accuracy (${cls.cv_folds}-fold CV)</div>
+      <div class="stat-value">${(cls.accuracy_mean * 100).toFixed(0)}% ± ${(cls.accuracy_std * 100).toFixed(0)}%</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Precision</div>
-      <div class="stat-value">${(cls.precision * 100).toFixed(0)}%</div>
+      <div class="stat-value">${(cls.precision_mean * 100).toFixed(0)}%</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Recall</div>
-      <div class="stat-value">${(cls.recall * 100).toFixed(0)}%</div>
+      <div class="stat-value">${(cls.recall_mean * 100).toFixed(0)}%</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">F1 Score</div>
-      <div class="stat-value">${cls.f1}</div>
+      <div class="stat-value">${cls.f1_mean} ± ${cls.f1_std}</div>
       <div class="stat-note">Median score used as the high/low cutoff: ${cls.median_challenge_score}</div>
     </div>
   `;
