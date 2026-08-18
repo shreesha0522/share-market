@@ -4,5 +4,6 @@ pandas==3.0.3
 numpy==2.5.0
 scipy==1.18.0
 statsmodels==0.14.6
+scikit-learn==1.7.1
 pytest==9.1.1
 python-dotenv==1.2.2
