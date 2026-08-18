@@ -4,6 +4,7 @@ import { loadInvestorLessons } from "./lessons.js";
 import { setupReadinessCheck } from "./readiness.js";
 import { loadSurveySummary, loadSectorLinkage, loadSurveyStats } from "./survey.js";
 import { loadMLPredictions } from "./ml.js";
+import { loadMethodologyComparison } from "./methodology.js";
 
 Chart.defaults.color = CHART_COLORS.muted;
 Chart.defaults.borderColor = CHART_COLORS.grid;
@@ -37,6 +38,7 @@ async function init() {
   await loadSurveyStats();
   await loadSectorLinkage();
   await loadMLPredictions();
+  await loadMethodologyComparison();
 
   document.getElementById("loadBtn").addEventListener("click", loadTickerView);
   document.getElementById("compareBtn").addEventListener("click", loadComparisonChart);
