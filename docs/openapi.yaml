@@ -92,6 +92,56 @@ paths:
         '404':
           description: Survey data not found
 
+  /api/survey/ml:
+    get:
+      summary: >
+        Cross-validated Random Forest regression (predicting challenge score)
+        and classification (high vs. low challenge), with a linear regression
+        baseline for the regression task. Complements the classical OLS
+        regression in /api/survey/stats.
+      responses:
+        '200':
+          description: >
+            ML evaluation results, including cross-validated R²/MAE (regression)
+            and accuracy/precision/recall/F1 (classification), each as mean ±
+            standard deviation across folds, plus feature importance and a
+            confusion matrix built from out-of-fold predictions.
+        '404':
+          description: Survey data not found
+  /api/survey/ml/predict:
+    get:
+      summary: >
+        Live single-investor prediction. Trains both models on the full survey
+        sample (no cross-validation split) and predicts a challenge score and
+        high/low classification for the given investor profile.
+      parameters:
+        - name: experience
+          in: query
+          required: true
+          schema: { type: string, enum: ["<1 year", "1-3 years", "3-5 years", "5+ years"] }
+        - name: portfolio
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: ["Below 50,000", "50,000-200,000", "200,000-500,000", "500,000-1,000,000", "Above 1,000,000"]
+        - name: trade_freq
+          in: query
+          required: true
+          schema: { type: string, enum: ["Rarely", "A few times a year", "Monthly", "Weekly", "Daily"] }
+        - name: sector
+          in: query
+          required: true
+          schema: { type: string, example: Banking }
+      responses:
+        '200':
+          description: >
+            Predicted challenge score, high/low classification with confidence,
+            and the sample average/median for comparison.
+        '400':
+          description: Missing or unrecognized parameter value
+        '404':
+          description: Survey data not found
   /api/health:
     get:
       summary: API liveness check
