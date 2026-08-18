@@ -1,7 +1,7 @@
 """
 app.py — Flask backend for the "New Investor Challenges — NEPSE" thesis project.
-This file only defines API routes; all analysis logic lives in analysis/market.py
-and analysis/survey.py.
+This file only defines API routes; all analysis logic lives in analysis/market.py,
+analysis/survey.py, and analysis/ml.py.
 """
 
 import os
@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
-from analysis import market, survey
+from analysis import market, ml, survey
 
 load_dotenv()  # loads variables from a .env file if present, falls back to defaults below
 
@@ -129,6 +129,26 @@ def api_survey_linkage():
     sector_metrics = market.compute_sector_metrics(company_metrics)
     linkage = survey.compute_sector_linkage(sector_metrics)
     return jsonify({"linkage": linkage, "is_synthetic": survey.is_synthetic_data()})
+
+
+@app.route("/api/survey/ml")
+def api_survey_ml():
+    """
+    Machine learning models predicting investor challenge outcomes from investing traits.
+    Complements the classical OLS regression in /api/survey/stats with:
+      - a Random Forest regressor predicting overall challenge score (vs a linear baseline)
+      - a Random Forest classifier separating "high challenge" from "low challenge" respondents
+    """
+    if not os.path.exists(survey.SURVEY_PATH):
+        return jsonify({"error": "Survey data not found"}), 404
+    all_data = market.load_market_data_all()
+    company_metrics = market.compute_company_metrics(all_data)
+    sector_metrics = market.compute_sector_metrics(company_metrics)
+    return jsonify({
+        "is_synthetic": survey.is_synthetic_data(),
+        "challenge_score_prediction": ml.predict_challenge_score(sector_metrics),
+        "high_challenge_classification": ml.classify_high_challenge(sector_metrics),
+    })
 
 
 @app.route("/api/health")
