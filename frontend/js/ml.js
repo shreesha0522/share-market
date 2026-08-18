@@ -162,3 +162,71 @@ function renderClassification(cls) {
     </tbody>
   `;
 }
+
+export async function setupPredictionForm() {
+  const form = document.getElementById("predictForm");
+  const sectorSelect = document.getElementById("pSector");
+  const resultEl = document.getElementById("predictResult");
+  if (!form || !sectorSelect || !resultEl) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/market/summary`);
+    if (res.ok) {
+      const data = await res.json();
+      sectorSelect.innerHTML = (data.sector_metrics || [])
+        .map((s) => `<option value="${s.sector}">${s.sector}</option>`)
+        .join("");
+    }
+  } catch (err) {
+    sectorSelect.innerHTML = `<option value="">Couldn't load sectors</option>`;
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const experience = document.getElementById("pExperience").value;
+    const portfolio = document.getElementById("pPortfolio").value;
+    const tradeFreq = document.getElementById("pTradeFreq").value;
+    const sector = sectorSelect.value;
+
+    resultEl.className = "readiness-result show";
+    resultEl.innerHTML = `<p>Running prediction…</p>`;
+
+    const params = new URLSearchParams({ experience, portfolio, trade_freq: tradeFreq, sector });
+
+    try {
+      const res = await fetch(`${API_BASE}/survey/ml/predict?${params}`);
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        resultEl.className = "readiness-result show mismatch";
+        resultEl.innerHTML = `<p class="result-title mismatch">Couldn't run the prediction</p><p>${data.error || friendlyFetchError(new Error())}</p>`;
+        return;
+      }
+
+      const labelText = data.predicted_label === "high_challenge" ? "above-average challenge" : "below-average challenge";
+      const cssClass = data.predicted_label === "high_challenge" ? "mismatch" : "match";
+      const confidenceText = data.confidence !== null && data.confidence !== undefined
+        ? ` (model confidence: ${(data.confidence * 100).toFixed(0)}%)`
+        : "";
+
+      resultEl.className = `readiness-result show ${cssClass}`;
+      resultEl.innerHTML = `
+        <p class="result-title ${cssClass}">Predicted challenge score: ${data.predicted_challenge_score} / 5</p>
+        <p>
+          Based on this profile, the model predicts <strong>${labelText}</strong> relative to
+          other respondents${confidenceText}. For comparison, the survey sample's average
+          overall challenge score is <strong>${data.sample_average_score}</strong> and the
+          median is <strong>${data.sample_median_score}</strong>.
+        </p>
+        <p style="opacity: 0.75; font-size: 0.9em;">
+          Trained on ${data.n_training_samples} survey respondents — with a sample this small,
+          treat this as an illustrative estimate, not a validated forecast.
+        </p>
+      `;
+    } catch (err) {
+      resultEl.className = "readiness-result show mismatch";
+      resultEl.innerHTML = `<p class="result-title mismatch">Couldn't run the prediction</p><p>${friendlyFetchError(err)}</p>`;
+    }
+  });
+}

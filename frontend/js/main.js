@@ -3,7 +3,7 @@ import { loadTickerList, loadTickerView, loadMarketSummaryTable, loadCorrelation
 import { loadInvestorLessons } from "./lessons.js";
 import { setupReadinessCheck } from "./readiness.js";
 import { loadSurveySummary, loadSectorLinkage, loadSurveyStats } from "./survey.js";
-import { loadMLPredictions } from "./ml.js";
+import { loadMLPredictions, setupPredictionForm } from "./ml.js";
 import { loadMethodologyComparison } from "./methodology.js";
 
 Chart.defaults.color = CHART_COLORS.muted;
@@ -38,6 +38,7 @@ async function init() {
   await loadSurveyStats();
   await loadSectorLinkage();
   await loadMLPredictions();
+  await setupPredictionForm();
   await loadMethodologyComparison();
 
   document.getElementById("loadBtn").addEventListener("click", loadTickerView);
