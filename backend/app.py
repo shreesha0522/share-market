@@ -151,6 +151,37 @@ def api_survey_ml():
     })
 
 
+@app.route("/api/survey/ml/predict")
+def api_survey_ml_predict():
+    """
+    Live single-investor prediction. Query params: experience, portfolio, trade_freq, sector
+    (must match the same category labels used in the survey CSV, e.g. experience=1-3 years).
+    Trains on the full survey sample and returns a predicted challenge score plus a
+    high/low challenge classification for the given investor profile.
+    """
+    if not os.path.exists(survey.SURVEY_PATH):
+        return jsonify({"error": "Survey data not found"}), 404
+
+    experience = request.args.get("experience")
+    portfolio = request.args.get("portfolio")
+    trade_freq = request.args.get("trade_freq")
+    sector = request.args.get("sector")
+
+    if not all([experience, portfolio, trade_freq, sector]):
+        return jsonify({"error": "Missing required params: experience, portfolio, trade_freq, sector"}), 400
+
+    all_data = market.load_market_data_all()
+    company_metrics = market.compute_company_metrics(all_data)
+    sector_metrics = market.compute_sector_metrics(company_metrics)
+
+    result = ml.predict_for_investor(sector_metrics, experience, portfolio, trade_freq, sector)
+    if "error" in result:
+        return jsonify(result), 400
+
+    result["is_synthetic"] = survey.is_synthetic_data()
+    return jsonify(result)
+
+
 @app.route("/api/health")
 def api_health():
     """Simple liveness check for the API."""

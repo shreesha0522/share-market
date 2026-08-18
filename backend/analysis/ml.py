@@ -2,7 +2,7 @@
 ml.py — Machine learning models for the "New Investor Challenges — NEPSE" thesis project.
 
 This complements the classical statistics in survey.py (OLS regression, Pearson
-correlation) with two supervised ML models trained on the same survey data:
+correlation) with supervised ML models trained on the same survey data:
 
 1. A Random Forest regressor predicting a respondent's overall challenge score
    from their investing traits (experience, portfolio size, trade frequency,
@@ -11,11 +11,22 @@ correlation) with two supervised ML models trained on the same survey data:
 2. A Random Forest classifier predicting whether a respondent is "high challenge"
    (above the sample median) or "low challenge", plus which traits matter most
    (feature importance) — a different lens on the same question.
+3. A live single-investor prediction: given one investor's traits, train both
+   models on the FULL sample (no holdout) and predict their likely challenge
+   score and high/low classification.
 
-Both models train fresh on every call. The survey dataset for a thesis project
-is small (tens to a few hundred rows), so this is not meant to be a production
-model — it's meant to produce an honest, reproducible R²/accuracy figure you
-can cite, with a held-out test set where the sample size allows one.
+NOTE ON SECTOR COVERAGE: some respondents report investing in sectors not
+tracked in the NEPSE market dataset (e.g. "Manufacturing", "Hotels", "Other").
+For those respondents, exposure_volatility is imputed with the average
+volatility across all tracked sectors, rather than dropping the respondent
+entirely — this is a stated assumption, not a hidden one; the imputed count
+is reported alongside every result so it can be disclosed in the write-up.
+
+The evaluation models (1 and 2) train fresh on every call and hold out a test
+split where sample size allows, since the goal there is an honest accuracy
+figure to cite. The live prediction (3) intentionally trains on all available
+data instead, since withholding data would only make a one-off estimate less
+informed — it is not meant to produce a citable accuracy metric.
 """
 
 from typing import Any
@@ -51,7 +62,10 @@ MIN_ROWS_FOR_HOLDOUT = 12  # below this, a train/test split is too noisy to mean
 
 def _build_features(sector_metrics: pd.DataFrame) -> pd.DataFrame:
     """Load survey data and engineer the same features used in survey.statistical_analysis,
-    plus each respondent's average exposure volatility (the market side of the study)."""
+    plus each respondent's average exposure volatility (the market side of the study).
+    Respondents invested only in sectors outside the tracked market dataset get their
+    exposure volatility imputed with the overall tracked-sector average, flagged via
+    'sector_outside_market_data', instead of being dropped from the analysis."""
     df = pd.read_csv(SURVEY_PATH)
     df["overall_challenge_score"] = df[CHALLENGE_COLS].mean(axis=1)
 
@@ -60,13 +74,17 @@ def _build_features(sector_metrics: pd.DataFrame) -> pd.DataFrame:
     df["trade_freq_ordinal"] = df["trade_frequency"].map(TRADE_FREQ_ORDER)
 
     sector_vol_lookup = sector_metrics.set_index("sector")["avg_volatility_pct"].to_dict()
+    overall_mean_vol = float(np.mean(list(sector_vol_lookup.values())))
 
     def avg_exposure_volatility(sectors_str):
         sectors = [s.strip() for s in str(sectors_str).split(",")]
         vols = [sector_vol_lookup[s] for s in sectors if s in sector_vol_lookup]
         return np.mean(vols) if vols else np.nan
 
-    df["exposure_volatility"] = df["sectors_invested"].apply(avg_exposure_volatility)
+    df["exposure_volatility_raw"] = df["sectors_invested"].apply(avg_exposure_volatility)
+    df["sector_outside_market_data"] = df["exposure_volatility_raw"].isna()
+    df["exposure_volatility"] = df["exposure_volatility_raw"].fillna(overall_mean_vol)
+
     return df.dropna(subset=FEATURE_COLS + ["overall_challenge_score"])
 
 
@@ -98,6 +116,7 @@ def predict_challenge_score(sector_metrics: pd.DataFrame) -> dict[str, Any]:
 
     return {
         "n_samples": int(len(df)),
+        "n_imputed_sector_exposure": int(df["sector_outside_market_data"].sum()),
         "used_holdout_test_set": had_holdout,
         "test_set_size": int(len(X_test)),
         "random_forest": {
@@ -132,6 +151,7 @@ def classify_high_challenge(sector_metrics: pd.DataFrame) -> dict[str, Any]:
 
     return {
         "n_samples": int(len(df)),
+        "n_imputed_sector_exposure": int(df["sector_outside_market_data"].sum()),
         "median_challenge_score": round(float(median_score), 2),
         "used_holdout_test_set": had_holdout,
         "test_set_size": int(len(X_test)),
@@ -145,3 +165,69 @@ def classify_high_challenge(sector_metrics: pd.DataFrame) -> dict[str, Any]:
         },
         "feature_importance": {k: round(float(v), 4) for k, v in zip(FEATURE_COLS, model.feature_importances_)},
     }
+
+
+def predict_for_investor(
+    sector_metrics: pd.DataFrame,
+    experience: str,
+    portfolio: str,
+    trade_freq: str,
+    sector: str,
+) -> dict[str, Any]:
+    """
+    Train both models on the FULL survey sample (no holdout — a single live prediction
+    should use all available data rather than withhold some) and predict one investor's
+    likely challenge score and high/low challenge classification from their stated traits.
+    """
+    if experience not in EXPERIENCE_ORDER:
+        return {"error": f"Unknown experience bracket '{experience}'."}
+    if portfolio not in PORTFOLIO_ORDER:
+        return {"error": f"Unknown portfolio bracket '{portfolio}'."}
+    if trade_freq not in TRADE_FREQ_ORDER:
+        return {"error": f"Unknown trade frequency '{trade_freq}'."}
+
+    sector_vol_lookup = sector_metrics.set_index("sector")["avg_volatility_pct"].to_dict()
+    if sector not in sector_vol_lookup:
+        return {"error": f"Unknown sector '{sector}'."}
+
+    df = _build_features(sector_metrics)
+    if len(df) < 5:
+        return {"error": "Not enough survey data yet to make a prediction."}
+
+    X_input = pd.DataFrame([{
+        "experience_ordinal": EXPERIENCE_ORDER[experience],
+        "portfolio_ordinal": PORTFOLIO_ORDER[portfolio],
+        "trade_freq_ordinal": TRADE_FREQ_ORDER[trade_freq],
+        "exposure_volatility": sector_vol_lookup[sector],
+    }])[FEATURE_COLS]
+
+    X, y = df[FEATURE_COLS], df["overall_challenge_score"]
+
+    reg_model = RandomForestRegressor(n_estimators=200, max_depth=4, random_state=RANDOM_STATE)
+    reg_model.fit(X, y)
+    predicted_score = float(reg_model.predict(X_input)[0])
+
+    median_score = float(y.median())
+    y_class = (y > median_score).astype(int)
+
+    result: dict[str, Any] = {
+        "predicted_challenge_score": round(predicted_score, 2),
+        "sample_median_score": round(median_score, 2),
+        "sample_average_score": round(float(y.mean()), 2),
+        "n_training_samples": int(len(df)),
+        "predicted_label": None,
+        "confidence": None,
+    }
+
+    if y_class.nunique() >= 2:
+        cls_model = RandomForestClassifier(n_estimators=200, max_depth=4, random_state=RANDOM_STATE)
+        cls_model.fit(X, y_class)
+        pred_class = int(cls_model.predict(X_input)[0])
+        classes = list(cls_model.classes_)
+        pred_proba = cls_model.predict_proba(X_input)[0]
+        confidence = float(pred_proba[classes.index(1)]) if 1 in classes else None
+
+        result["predicted_label"] = "high_challenge" if pred_class == 1 else "low_challenge"
+        result["confidence"] = round(confidence, 3) if confidence is not None else None
+
+    return result
