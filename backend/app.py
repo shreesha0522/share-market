@@ -4,6 +4,7 @@ This file only defines API routes; all analysis logic lives in analysis/market.p
 analysis/survey.py, and analysis/ml.py.
 """
 
+import logging
 import os
 
 import pandas as pd
@@ -21,6 +22,41 @@ CORS(app)
 FLASK_PORT = int(os.environ.get("FLASK_PORT", 5000))
 FLASK_DEBUG = os.environ.get("FLASK_DEBUG", "true").lower() == "true"
 
+# --- Logging setup -----------------------------------------------------------
+# A basic, non-intrusive logging config: logs to stdout, which is enough for both
+# local development and CI/CD environments (e.g. GitHub Actions) without needing
+# a log file or external logging service.
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger("nepse_api")
+
+
+def get_sector_metrics() -> pd.DataFrame:
+    """
+    Shared pipeline: load all market data, compute company-level metrics, then
+    aggregate to sector level. Several routes need sector-level volatility as
+    an input (for survey linkage, ML feature engineering, etc.), so this is
+    factored out into one place rather than repeated in every route.
+    """
+    all_data = market.load_market_data_all()
+    company_metrics = market.compute_company_metrics(all_data)
+    return market.compute_sector_metrics(company_metrics)
+
+
+# --- Routes --------------------------------------------------------------
+
+@app.route("/")
+def api_root():
+    """Basic API info and a pointer to the documented endpoints."""
+    return jsonify({
+        "name": "New Investor Risk Monitor API",
+        "description": "Backend for the 'New Investor Challenges — NEPSE' thesis project.",
+        "docs": "See docs/openapi.yaml in the repository for full endpoint documentation.",
+        "health_check": "/api/health",
+    })
+
 
 @app.route("/api/tickers")
 def api_tickers():
@@ -31,6 +67,7 @@ def api_tickers():
 def api_market_ticker(ticker):
     ticker = ticker.upper()
     if ticker not in market.SECTOR_MAP:
+        logger.warning("Requested unknown ticker: %s", ticker)
         return jsonify({"error": f"Unknown ticker '{ticker}'"}), 404
 
     start = request.args.get("start")
@@ -46,6 +83,7 @@ def api_market_ticker(ticker):
     df = market.load_ticker(ticker, start, end)
 
     if df is None:
+        logger.error("No data file found for ticker: %s", ticker)
         return jsonify({"error": f"No data file found for '{ticker}'"}), 404
     if df.empty:
         return jsonify({"error": "No data in the selected date range"}), 404
@@ -97,10 +135,12 @@ def api_market_correlation():
         "matrix": corr.to_dict(),
     })
 
+
 @app.route("/api/survey/summary")
 def api_survey_summary():
     """Return ranked challenges, demographic breakdowns, and profitability stats from the survey."""
     if not os.path.exists(survey.SURVEY_PATH):
+        logger.error("Survey data file not found at %s", survey.SURVEY_PATH)
         return jsonify({"error": "Survey data not found"}), 404
     result = survey.analyze_survey()
     result["is_synthetic"] = survey.is_synthetic_data()
@@ -112,9 +152,7 @@ def api_survey_stats():
     """Return correlation and regression analysis linking investor traits to reported challenges."""
     if not os.path.exists(survey.SURVEY_PATH):
         return jsonify({"error": "Survey data not found"}), 404
-    all_data = market.load_market_data_all()
-    company_metrics = market.compute_company_metrics(all_data)
-    sector_metrics = market.compute_sector_metrics(company_metrics)
+    sector_metrics = get_sector_metrics()
     result = survey.statistical_analysis(sector_metrics)
     return jsonify(result)
 
@@ -124,9 +162,7 @@ def api_survey_linkage():
     """Links each sector's real market volatility to survey respondents' perceived difficulty for it."""
     if not os.path.exists(survey.SURVEY_PATH):
         return jsonify({"error": "Survey data not found"}), 404
-    all_data = market.load_market_data_all()
-    company_metrics = market.compute_company_metrics(all_data)
-    sector_metrics = market.compute_sector_metrics(company_metrics)
+    sector_metrics = get_sector_metrics()
     linkage = survey.compute_sector_linkage(sector_metrics)
     return jsonify({"linkage": linkage, "is_synthetic": survey.is_synthetic_data()})
 
@@ -141,9 +177,7 @@ def api_survey_ml():
     """
     if not os.path.exists(survey.SURVEY_PATH):
         return jsonify({"error": "Survey data not found"}), 404
-    all_data = market.load_market_data_all()
-    company_metrics = market.compute_company_metrics(all_data)
-    sector_metrics = market.compute_sector_metrics(company_metrics)
+    sector_metrics = get_sector_metrics()
     return jsonify({
         "is_synthetic": survey.is_synthetic_data(),
         "challenge_score_prediction": ml.predict_challenge_score(sector_metrics),
@@ -170,12 +204,11 @@ def api_survey_ml_predict():
     if not all([experience, portfolio, trade_freq, sector]):
         return jsonify({"error": "Missing required params: experience, portfolio, trade_freq, sector"}), 400
 
-    all_data = market.load_market_data_all()
-    company_metrics = market.compute_company_metrics(all_data)
-    sector_metrics = market.compute_sector_metrics(company_metrics)
+    sector_metrics = get_sector_metrics()
 
     result = ml.predict_for_investor(sector_metrics, experience, portfolio, trade_freq, sector)
     if "error" in result:
+        logger.info("Prediction request rejected: %s", result["error"])
         return jsonify(result), 400
 
     result["is_synthetic"] = survey.is_synthetic_data()
@@ -195,8 +228,10 @@ def not_found(e):
 
 @app.errorhandler(500)
 def server_error(e):
+    logger.exception("Unhandled server error")
     return jsonify({"error": "Internal server error."}), 500
 
 
 if __name__ == "__main__":
+    logger.info("Starting NEPSE Investor Challenges API on port %s (debug=%s)", FLASK_PORT, FLASK_DEBUG)
     app.run(debug=FLASK_DEBUG, port=FLASK_PORT)
