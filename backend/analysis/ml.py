@@ -39,7 +39,12 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import KFold, StratifiedKFold, cross_val_predict, cross_val_score
+from sklearn.model_selection import (
+    KFold,
+    StratifiedKFold,
+    cross_val_predict,
+    cross_val_score,
+)
 
 from analysis.survey import (
     CHALLENGE_COLS,
@@ -240,7 +245,7 @@ def predict_for_investor(
         "predicted_challenge_score": round(predicted_score, 2),
         "sample_median_score": round(median_score, 2),
         "sample_average_score": round(float(y.mean()), 2),
-        "n_training_samples": int(len(df)),
+        "n_training_samples": len(df),
         "predicted_label": None,
         "confidence": None,
     }

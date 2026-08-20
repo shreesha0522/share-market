@@ -84,7 +84,7 @@ def analyze_survey() -> dict[str, Any]:
     confidence = df["confidence_change"].value_counts(normalize=True).mul(100).round(1)
 
     return {
-        "n_respondents": int(len(df)),
+        "n_respondents": len(df),
         "ranked_challenges": ranked_named,
         "by_experience": by_experience.to_dict(orient="records"),
         "by_age": by_age.to_dict(orient="records"),

@@ -3,7 +3,6 @@ market.py — Market data loading and analysis for NEPSE historical price data.
 """
 
 import os
-from typing import Optional
 
 import pandas as pd
 
@@ -19,7 +18,7 @@ SECTOR_MAP = {
 }
 
 
-def load_ticker(ticker: str, start: Optional[str] = None, end: Optional[str] = None) -> Optional[pd.DataFrame]:
+def load_ticker(ticker: str, start: str | None = None, end: str | None = None) -> pd.DataFrame | None:
     """Load one ticker's price history and compute volatility, drawdown, moving averages, and volume spikes."""
     path = os.path.join(MARKET_DIR, f"{ticker}.csv")
     if not os.path.exists(path):
@@ -89,7 +88,7 @@ def compute_company_metrics(all_data: pd.DataFrame, recent_years: int = 5) -> pd
             "total_return_pct": round(float(total_return), 2),
             "volatility_pct": round(float(volatility), 2),
             "avg_daily_volume": round(float(avg_daily_volume), 0),
-            "n_trading_days": int(len(group)),
+            "n_trading_days": len(group),
             "risk_adjusted_return": risk_adjusted_return,
         })
     return pd.DataFrame(metrics).sort_values("volatility_pct", ascending=False)
@@ -138,7 +137,7 @@ def compute_extreme_days(df: pd.DataFrame) -> dict:
     return {"best": to_day_list(best_days), "worst": to_day_list(worst_days)}
 
 
-def compute_value_at_risk(df: pd.DataFrame) -> Optional[float]:
+def compute_value_at_risk(df: pd.DataFrame) -> float | None:
     """95% historical Value at Risk: the daily loss threshold exceeded only 5% of the time."""
     returns = df["Daily Return"].dropna()
     return None if returns.empty else round(float(returns.quantile(0.05)), 4)
