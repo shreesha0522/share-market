@@ -30,6 +30,7 @@ def load_ticker(ticker: str, start: Optional[str] = None, end: Optional[str] = N
     df = df.dropna(subset=["published_date", "close"])
     df = df.sort_values("published_date")
     df = df.set_index("published_date")
+    df = df[~df.index.duplicated(keep="first")]
     df = df.rename(columns={"close": "Close", "traded_quantity": "Volume"})
 
     if start:

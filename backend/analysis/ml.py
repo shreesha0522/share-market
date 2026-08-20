@@ -12,8 +12,18 @@ correlation) with supervised ML models trained on the same survey data:
    (above the sample median) or "low challenge", plus which traits matter most
    (feature importance) — a different lens on the same question.
 3. A live single-investor prediction: given one investor's traits, train both
-   models on the FULL sample (no holdout) and predict their likely challenge
-   score and high/low classification.
+   models on the FULL sample and predict their likely challenge score and
+   high/low classification.
+
+EVALUATION METHOD: with only ~18 survey respondents, a single train/test split
+is noisy — whichever few rows land in the test set can swing R²/accuracy
+wildly and unrepresentatively. Models 1 and 2 below use K-FOLD CROSS-VALIDATION
+instead: the data is split into K folds, each fold takes a turn as the test
+set while the model trains on the rest, and the metrics reported are the
+mean ± standard deviation across all folds. This is a materially more honest
+estimate of how well the model generalizes than one split, and is what should
+be cited in the thesis write-up. K is chosen automatically based on sample
+size (see _choose_k below) and always reported alongside the results.
 
 NOTE ON SECTOR COVERAGE: some respondents report investing in sectors not
 tracked in the NEPSE market dataset (e.g. "Manufacturing", "Hotels", "Other").
@@ -21,12 +31,6 @@ For those respondents, exposure_volatility is imputed with the average
 volatility across all tracked sectors, rather than dropping the respondent
 entirely — this is a stated assumption, not a hidden one; the imputed count
 is reported alongside every result so it can be disclosed in the write-up.
-
-The evaluation models (1 and 2) train fresh on every call and hold out a test
-split where sample size allows, since the goal there is an honest accuracy
-figure to cite. The live prediction (3) intentionally trains on all available
-data instead, since withholding data would only make a one-off estimate less
-informed — it is not meant to produce a citable accuracy metric.
 """
 
 from typing import Any
@@ -35,16 +39,7 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import (
-    accuracy_score,
-    confusion_matrix,
-    f1_score,
-    mean_absolute_error,
-    precision_score,
-    r2_score,
-    recall_score,
-)
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import KFold, StratifiedKFold, cross_val_predict, cross_val_score
 
 from analysis.survey import (
     CHALLENGE_COLS,
@@ -57,7 +52,12 @@ from analysis.survey import (
 FEATURE_COLS = ["experience_ordinal", "portfolio_ordinal", "trade_freq_ordinal", "exposure_volatility"]
 
 RANDOM_STATE = 42  # fixed seed so results are reproducible for the write-up
-MIN_ROWS_FOR_HOLDOUT = 12  # below this, a train/test split is too noisy to mean anything
+MIN_ROWS_FOR_CV = 8  # below this, even cross-validation folds are too small to be meaningful
+
+
+def _choose_k(n_rows: int) -> int:
+    """Pick a fold count that keeps at least ~4 rows per test fold, capped at 5."""
+    return max(2, min(5, n_rows // 4))
 
 
 def _build_features(sector_metrics: pd.DataFrame) -> pd.DataFrame:
@@ -88,82 +88,108 @@ def _build_features(sector_metrics: pd.DataFrame) -> pd.DataFrame:
     return df.dropna(subset=FEATURE_COLS + ["overall_challenge_score"])
 
 
-def _safe_split(X, y, stratify=None):
-    """Train/test split that degrades gracefully on small survey samples: below
-    MIN_ROWS_FOR_HOLDOUT rows, train on everything and flag that no real holdout
-    was used, instead of returning a test-set metric that isn't meaningful."""
-    if len(X) < MIN_ROWS_FOR_HOLDOUT:
-        return X, X, y, y, False
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.25, random_state=RANDOM_STATE, stratify=stratify
-    )
-    return X_train, X_test, y_train, y_test, True
-
-
 def predict_challenge_score(sector_metrics: pd.DataFrame) -> dict[str, Any]:
     """Random Forest regression predicting overall challenge score from investor traits,
-    reported alongside a plain linear regression baseline for comparison."""
+    evaluated with K-fold cross-validation (mean ± std R²/MAE across folds), reported
+    alongside a plain linear regression baseline evaluated the same way."""
     df = _build_features(sector_metrics)
     X, y = df[FEATURE_COLS], df["overall_challenge_score"]
-    X_train, X_test, y_train, y_test, had_holdout = _safe_split(X, y)
+    n = len(df)
 
-    model = RandomForestRegressor(n_estimators=200, max_depth=4, random_state=RANDOM_STATE)
-    model.fit(X_train, y_train)
-    preds = model.predict(X_test)
+    if n < MIN_ROWS_FOR_CV:
+        return {
+            "error": f"Only {n} usable survey responses — need at least {MIN_ROWS_FOR_CV} for cross-validated evaluation.",
+            "n_samples": n,
+        }
 
-    baseline = LinearRegression().fit(X_train, y_train)
-    baseline_preds = baseline.predict(X_test)
+    k = _choose_k(n)
+    kf = KFold(n_splits=k, shuffle=True, random_state=RANDOM_STATE)
+
+    rf = RandomForestRegressor(n_estimators=200, max_depth=4, random_state=RANDOM_STATE)
+    rf_r2_folds = cross_val_score(rf, X, y, cv=kf, scoring="r2")
+    rf_mae_folds = -cross_val_score(rf, X, y, cv=kf, scoring="neg_mean_absolute_error")
+
+    lin = LinearRegression()
+    lin_r2_folds = cross_val_score(lin, X, y, cv=kf, scoring="r2")
+    lin_mae_folds = -cross_val_score(lin, X, y, cv=kf, scoring="neg_mean_absolute_error")
+
+    # Fit on the full sample once more to report feature importance (not fold-specific,
+    # but the standard way to report importance when the fit itself is cross-validated).
+    rf_full = RandomForestRegressor(n_estimators=200, max_depth=4, random_state=RANDOM_STATE).fit(X, y)
 
     return {
-        "n_samples": int(len(df)),
+        "n_samples": n,
         "n_imputed_sector_exposure": int(df["sector_outside_market_data"].sum()),
-        "used_holdout_test_set": had_holdout,
-        "test_set_size": int(len(X_test)),
+        "cv_folds": k,
         "random_forest": {
-            "r_squared": round(float(r2_score(y_test, preds)), 3),
-            "mae": round(float(mean_absolute_error(y_test, preds)), 3),
-            "feature_importance": {k: round(float(v), 4) for k, v in zip(FEATURE_COLS, model.feature_importances_)},
+            "r_squared_mean": round(float(rf_r2_folds.mean()), 3),
+            "r_squared_std": round(float(rf_r2_folds.std()), 3),
+            "mae_mean": round(float(rf_mae_folds.mean()), 3),
+            "mae_std": round(float(rf_mae_folds.std()), 3),
+            "feature_importance": {k_: round(float(v), 4) for k_, v in zip(FEATURE_COLS, rf_full.feature_importances_)},
         },
         "linear_regression_baseline": {
-            "r_squared": round(float(r2_score(y_test, baseline_preds)), 3),
-            "mae": round(float(mean_absolute_error(y_test, baseline_preds)), 3),
+            "r_squared_mean": round(float(lin_r2_folds.mean()), 3),
+            "r_squared_std": round(float(lin_r2_folds.std()), 3),
+            "mae_mean": round(float(lin_mae_folds.mean()), 3),
+            "mae_std": round(float(lin_mae_folds.std()), 3),
         },
     }
 
 
 def classify_high_challenge(sector_metrics: pd.DataFrame) -> dict[str, Any]:
     """Random Forest classifier: is a respondent 'high challenge' (above the sample
-    median overall score) or 'low challenge', predicted from the same investor traits."""
+    median overall score) or 'low challenge', evaluated with stratified K-fold
+    cross-validation (mean ± std accuracy/F1 across folds)."""
     df = _build_features(sector_metrics)
     median_score = df["overall_challenge_score"].median()
     df["high_challenge"] = (df["overall_challenge_score"] > median_score).astype(int)
 
     X, y = df[FEATURE_COLS], df["high_challenge"]
+    n = len(df)
+
     if y.nunique() < 2:
         return {"error": "Not enough variation in challenge scores to classify — all respondents fall on one side of the median."}
+    if n < MIN_ROWS_FOR_CV:
+        return {
+            "error": f"Only {n} usable survey responses — need at least {MIN_ROWS_FOR_CV} for cross-validated evaluation.",
+            "n_samples": n,
+        }
 
-    stratify = y if len(df) >= MIN_ROWS_FOR_HOLDOUT else None
-    X_train, X_test, y_train, y_test, had_holdout = _safe_split(X, y, stratify=stratify)
+    k = _choose_k(n)
+    skf = StratifiedKFold(n_splits=k, shuffle=True, random_state=RANDOM_STATE)
 
     model = RandomForestClassifier(n_estimators=200, max_depth=4, random_state=RANDOM_STATE)
-    model.fit(X_train, y_train)
-    preds = model.predict(X_test)
+    acc_folds = cross_val_score(model, X, y, cv=skf, scoring="accuracy")
+    f1_folds = cross_val_score(model, X, y, cv=skf, scoring="f1", error_score=np.nan)
+    precision_folds = cross_val_score(model, X, y, cv=skf, scoring="precision", error_score=np.nan)
+    recall_folds = cross_val_score(model, X, y, cv=skf, scoring="recall", error_score=np.nan)
+
+    # Out-of-fold predictions give an honest confusion matrix without a second holdout.
+    oof_preds = cross_val_predict(model, X, y, cv=skf)
+
+    from sklearn.metrics import confusion_matrix
+    cm = confusion_matrix(y, oof_preds, labels=[0, 1]).tolist()
+
+    model_full = RandomForestClassifier(n_estimators=200, max_depth=4, random_state=RANDOM_STATE).fit(X, y)
 
     return {
-        "n_samples": int(len(df)),
+        "n_samples": n,
         "n_imputed_sector_exposure": int(df["sector_outside_market_data"].sum()),
         "median_challenge_score": round(float(median_score), 2),
-        "used_holdout_test_set": had_holdout,
-        "test_set_size": int(len(X_test)),
-        "accuracy": round(float(accuracy_score(y_test, preds)), 3),
-        "precision": round(float(precision_score(y_test, preds, zero_division=0)), 3),
-        "recall": round(float(recall_score(y_test, preds, zero_division=0)), 3),
-        "f1": round(float(f1_score(y_test, preds, zero_division=0)), 3),
+        "cv_folds": k,
+        "accuracy_mean": round(float(np.nanmean(acc_folds)), 3),
+        "accuracy_std": round(float(np.nanstd(acc_folds)), 3),
+        "precision_mean": round(float(np.nanmean(precision_folds)), 3),
+        "recall_mean": round(float(np.nanmean(recall_folds)), 3),
+        "f1_mean": round(float(np.nanmean(f1_folds)), 3),
+        "f1_std": round(float(np.nanstd(f1_folds)), 3),
         "confusion_matrix": {
             "labels": ["low_challenge", "high_challenge"],
-            "matrix": confusion_matrix(y_test, preds, labels=[0, 1]).tolist(),
+            "matrix": cm,
+            "note": "Built from out-of-fold predictions across all cross-validation folds, not a separate holdout.",
         },
-        "feature_importance": {k: round(float(v), 4) for k, v in zip(FEATURE_COLS, model.feature_importances_)},
+        "feature_importance": {k_: round(float(v), 4) for k_, v in zip(FEATURE_COLS, model_full.feature_importances_)},
     }
 
 
